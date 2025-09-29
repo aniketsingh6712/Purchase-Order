@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userRecord"); // Mongoose model
-const authenticateToken = require("../middleware/auth"); // JWT middleware
+const { authenticateToken, roleCheck } = require("../middleware/auth");
 
 // Register route
 router.post("/register", async (req, res) => {

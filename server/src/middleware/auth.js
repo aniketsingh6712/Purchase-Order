@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 
+// Middleware to authenticate JWT token
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -16,9 +17,8 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-module.exports = authenticateToken;
-
-exports.roleCheck = (role) => {
+// Middleware to check role
+const roleCheck = (role) => {
   return (req, res, next) => {
     if (req.user.role !== role) {
       return res.status(403).json({ error: "Forbidden: insufficient role" });
@@ -26,3 +26,6 @@ exports.roleCheck = (role) => {
     next();
   };
 };
+
+// Export both functions
+module.exports = { authenticateToken, roleCheck };

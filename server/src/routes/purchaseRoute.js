@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const PurchaseOrder = require("../models/purchaseRecord");
-const { authMiddleware, roleCheck } = require("../middleware/auth");
+const { authenticateToken, roleCheck } = require("../middleware/auth");
 
 
-router.post("/", authMiddleware, roleCheck("CREATOR"), async (req, res) => {
+router.post("/", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
   try {
     const { title, description, amount } = req.body;
 
@@ -26,7 +26,7 @@ router.post("/", authMiddleware, roleCheck("CREATOR"), async (req, res) => {
 });
 
 // 📌 Submit PO (Creator only)
-router.put("/:id/submit", authMiddleware, roleCheck("CREATOR"), async (req, res) => {
+router.put("/:id/submit", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id);
     if (!po) return res.status(404).json({ error: "PO not found" });
@@ -53,7 +53,7 @@ router.put("/:id/submit", authMiddleware, roleCheck("CREATOR"), async (req, res)
 });
 
 // 📌 Approve PO (Approver only)
-router.put("/:id/approve", authMiddleware, roleCheck("APPROVER"), async (req, res) => {
+router.put("/:id/approve", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id);
     if (!po) return res.status(404).json({ error: "PO not found" });
@@ -78,7 +78,7 @@ router.put("/:id/approve", authMiddleware, roleCheck("APPROVER"), async (req, re
 });
 
 // 📌 Reject PO (Approver only)
-router.put("/:id/reject", authMiddleware, roleCheck("APPROVER"), async (req, res) => {
+router.put("/:id/reject", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id);
     if (!po) return res.status(404).json({ error: "PO not found" });
@@ -103,7 +103,7 @@ router.put("/:id/reject", authMiddleware, roleCheck("APPROVER"), async (req, res
 });
 
 // 📌 Get all POs (Dashboard)
-router.get("/", authMiddleware, async (req, res) => {
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const filter = {};
     if (req.query.status) filter.status = req.query.status;
@@ -121,7 +121,7 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 // 📌 Get PO details (with history)
-router.get("/:id", authMiddleware, async (req, res) => {
+router.get("/:id", authenticateToken, async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id)
       .populate("createdBy", "name email")
@@ -139,7 +139,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
 
 
 // GET /api/po/my?status=DRAFT or status=SUBMITTED
-router.get("/my", authMiddleware, async (req, res) => {
+router.get("/my", authenticateToken, async (req, res) => {
   try {
     const filter = { createdBy: req.user.id };
     if (req.query.status) filter.status = req.query.status;
@@ -155,7 +155,7 @@ router.get("/my", authMiddleware, async (req, res) => {
 });
 
 // Get all Approved and Rejected POs created by logged-in user
-router.get("/my/completed", authMiddleware, async (req, res) => {
+router.get("/my/completed", authenticateToken, async (req, res) => {
   try {
     const completedPOs = await PurchaseOrder.find({
       createdBy: req.user.id,
@@ -170,7 +170,7 @@ router.get("/my/completed", authMiddleware, async (req, res) => {
   }
 });
 
-router.get("/approver/submitted", authMiddleware, roleCheck("APPROVER"), async (req, res) => {
+router.get("/approver/submitted", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
   try {
     const submittedPOs = await PurchaseOrder.find({
       assignedTo: req.user.id,
