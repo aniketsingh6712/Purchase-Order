@@ -4,7 +4,7 @@ const PurchaseOrder = require("../models/purchaseRecord");
 const { authenticateToken, roleCheck } = require("../middleware/auth");
 
 
-router.post("/", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
+router.post("/po", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
   try {
     const { title, description, amount } = req.body;
 
@@ -13,9 +13,9 @@ router.post("/", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
       description,
       amount,
       status: "DRAFT",
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
       history: [
-        { action: "CREATED", by: req.user.id, timestamp: new Date() }
+        { action: "CREATED", by: req.user.userId, timestamp: new Date() }
       ]
     });
 
@@ -26,7 +26,7 @@ router.post("/", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
 });
 
 // 📌 Submit PO (Creator only)
-router.put("/:id/submit", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
+router.put("/po/:id/submit", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id);
     if (!po) return res.status(404).json({ error: "PO not found" });
@@ -41,7 +41,7 @@ router.put("/:id/submit", authenticateToken, roleCheck("CREATOR"), async (req, r
     }
     po.history.push({
       action: "SUBMITTED",
-      by: req.user.id,
+      by: req.user.userId,
       timestamp: new Date()
     });
 
@@ -53,7 +53,7 @@ router.put("/:id/submit", authenticateToken, roleCheck("CREATOR"), async (req, r
 });
 
 // 📌 Approve PO (Approver only)
-router.put("/:id/approve", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
+router.put("/po/:id/approve", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id);
     if (!po) return res.status(404).json({ error: "PO not found" });
@@ -65,7 +65,7 @@ router.put("/:id/approve", authenticateToken, roleCheck("APPROVER"), async (req,
     po.status = "APPROVED";
     po.history.push({
       action: "APPROVED",
-      by: req.user.id,
+      by: req.user.userId,
       comment: req.body.comment,
       timestamp: new Date()
     });
@@ -78,7 +78,7 @@ router.put("/:id/approve", authenticateToken, roleCheck("APPROVER"), async (req,
 });
 
 // 📌 Reject PO (Approver only)
-router.put("/:id/reject", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
+router.put("/po/:id/reject", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id);
     if (!po) return res.status(404).json({ error: "PO not found" });
@@ -90,7 +90,7 @@ router.put("/:id/reject", authenticateToken, roleCheck("APPROVER"), async (req, 
     po.status = "REJECTED";
     po.history.push({
       action: "REJECTED",
-      by: req.user.id,
+      by: req.user.userId,
       comment: req.body.comment,
       timestamp: new Date()
     });
@@ -111,7 +111,7 @@ router.get("/", authenticateToken, async (req, res) => {
 
     const pos = await PurchaseOrder.find(filter)
       .populate("createdBy", "name email")
-      .populate("assignedTo", "name email")
+      .populate("approvedBy", "name email")
       .sort({ createdAt: -1 });
 
     res.status(200).json(pos);
@@ -121,7 +121,7 @@ router.get("/", authenticateToken, async (req, res) => {
 });
 
 // 📌 Get PO details (with history)
-router.get("/:id", authenticateToken, async (req, res) => {
+router.get("/po/:id", authenticateToken, async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id)
       .populate("createdBy", "name email")
@@ -141,11 +141,11 @@ router.get("/:id", authenticateToken, async (req, res) => {
 // GET /api/po/my?status=DRAFT or status=SUBMITTED
 router.get("/my", authenticateToken, async (req, res) => {
   try {
-    const filter = { createdBy: req.user.id };
+    const filter = { createdBy: req.user.userId };
     if (req.query.status) filter.status = req.query.status;
 
     const pos = await PurchaseOrder.find(filter)
-      .populate("assignedTo", "name email")
+      
       .sort({ createdAt: -1 });
 
     res.status(200).json(pos);
@@ -158,7 +158,7 @@ router.get("/my", authenticateToken, async (req, res) => {
 router.get("/my/completed", authenticateToken, async (req, res) => {
   try {
     const completedPOs = await PurchaseOrder.find({
-      createdBy: req.user.id,
+      createdBy: req.user.userId,
       status: { $in: ["APPROVED", "REJECTED"] } // filter approved and rejected
     })
       .populate("assignedTo", "name email")  // show approver info
@@ -173,7 +173,7 @@ router.get("/my/completed", authenticateToken, async (req, res) => {
 router.get("/approver/submitted", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
   try {
     const submittedPOs = await PurchaseOrder.find({
-      assignedTo: req.user.id,
+      assignedTo: req.user.userId,
       status: "SUBMITTED"
     })
       .populate("createdBy", "name email")  // show creator info
