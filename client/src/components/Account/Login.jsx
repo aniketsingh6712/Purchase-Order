@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 import * as loginFunc from "./LoginFunction";
 function Login() {
-  const [usernameOrEmail, setUsernameOrEmail] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +17,7 @@ function Login() {
     setLoading(true);
 
     loginFunc
-      .logUserIn({ usernameOrEmail, password })
+      .logUserIn({ userEmail, password })
       .then((response) => response.data)
       .then((data) => {
         const { token } = data;
@@ -45,13 +45,13 @@ function Login() {
         <form className="space-y-5" onSubmit={submitHandler}>
           <div>
             <label className="block mb-1 text-sm font-medium text-[#0066EE]">
-              Email or Username
+              Email 
             </label>
             <input
               type="text"
               placeholder="Enter your email or username"
-              value={usernameOrEmail}
-              onChange={(e) => setUsernameOrEmail(e.target.value)}
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
               className="w-full px-4 py-2 rounded-lg border border-[#0066EE] text-[#0066EE] placeholder-[#0066EE] outline-none focus:ring-2 focus:ring-[#0066EE]"
               required
             />
@@ -85,7 +85,7 @@ function Login() {
         <p className="text-center text-sm text-[#0066EE] mt-6">
           Don’t have an account?{" "}
           <NavLink
-            to="/register"
+            to="/signup"
             className="font-semibold underline hover:text-[#0055cc]"
           >
             Create account
