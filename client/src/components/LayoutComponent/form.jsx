@@ -51,6 +51,20 @@ const ExpenseForm = ({ formData, onChange }) => {
             className="w-full border rounded-md p-2 mt-1"
           />
         </div>
+
+         {/* Comments */}
+        <div>
+          <label className="input-label-style">Comment</label>
+          <textarea
+            name="comment"
+            value={formData.comment}
+            onChange={onChange}
+            placeholder="e.g. we need asap"
+            rows={1}
+            required
+            className="w-full border rounded-md p-2 mt-1"
+          />
+        </div>
       </div>
     </div>
   );

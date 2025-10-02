@@ -47,7 +47,7 @@ const PurchaseOrderTable=()=>{
   return (
      <>
       <Navbar/>
-    <div className="relative mt-6 p-4 border rounded-md shadow-sm bg-white">
+    <div className="relative mt-6 p-4 m-2 border rounded-md shadow-sm bg-white">
       {/* Controls */}
       <div className="flex justify-between items-center mb-6">
         <button

@@ -99,7 +99,8 @@ function UserDashboard() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    amount: ""
+    amount: "",
+    comment:"",
   });
 
   const [showForm, setShowForm] = useState(false);
