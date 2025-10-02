@@ -13,16 +13,16 @@ export default function Navbar() {
         {/* Desktop Menu */}
         <div className="hidden md:flex space-x-6">
           <a
-            href="#home"
+            href="/dashboard"
             className="hover:text-gray-200 transition-colors"
           >
             Home
           </a>
           <a
-            href="#previous-order"
+            href="/orders"
             className="hover:text-gray-200 transition-colors"
           >
-            Previous Order
+            Orders
           </a>
         </div>
 
