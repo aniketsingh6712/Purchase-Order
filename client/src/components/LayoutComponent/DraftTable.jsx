@@ -29,7 +29,7 @@ const dummyData = [
       status: "Rejected",
     },
   ];
-const DraftPurchaseOrderTable = ({ data,onDelete }) => {
+const DraftPurchaseOrderTable = ({ data,onDraftSubmit }) => {
   // Filter only draft orders
   const draftOrders = Array.isArray(dummyData)
     ? dummyData.filter((order) => order.status === "Draft")
@@ -71,7 +71,7 @@ const DraftPurchaseOrderTable = ({ data,onDelete }) => {
                   </td>
                    <td className="py-2 px-4">
                     <button
-                      onClick={() => onDelete(order.id)}
+                      onClick={() => onDraftSubmit(order.id)}
                       className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
                     >
                       Submit Order
