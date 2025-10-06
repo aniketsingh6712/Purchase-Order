@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaInfoCircle } from "react-icons/fa";
 import { X } from "lucide-react";
 
-const SubmittedPurchaseOrderTable = ({ data }) => {
+const SubmittedPurchaseOrderTable = ({ data ,approverHandler,rejectionHandler}) => {
   const [selectedOrder, setSelectedOrder] = useState(null); // for history modal
   const [actionOrder, setActionOrder] = useState(null); // for action popup
   const [comment, setComment] = useState("");
@@ -11,21 +11,7 @@ const SubmittedPurchaseOrderTable = ({ data }) => {
     ? data.filter((order) => order.status === "Submitted")
     : [];
 
-  // Action handlers
-  const handleApprove = () => {
-    console.log("Approved:", actionOrder, "Comment:", comment);
-    // 🔹 API call here → update status to APPROVED
-    setActionOrder(null);
-    setComment("");
-  };
-
-  const handleReject = () => {
-    console.log("Rejected:", actionOrder, "Comment:", comment);
-    // 🔹 API call here → update status to REJECTED
-    setActionOrder(null);
-    setComment("");
-  };
-
+ 
   return (
     <div className="relative mt-6 p-4 border rounded-md shadow-sm bg-white">
       <h2 className="text-lg font-semibold text-green-700 mb-4">
@@ -139,20 +125,20 @@ const SubmittedPurchaseOrderTable = ({ data }) => {
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Add comment (optional)"
+              placeholder="Add comment "
               rows={3}
               className="w-full border rounded-md p-2 mb-4"
             />
 
             <div className="flex justify-end gap-2">
               <button
-                onClick={handleReject}
+                onClick={()=>rejectionHandler(actionOrder._id,comment)}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
               >
                 Reject
               </button>
               <button
-                onClick={handleApprove}
+                onClick={()=>approverHandler(actionOrder._id,comment)}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
               >
                 Approve

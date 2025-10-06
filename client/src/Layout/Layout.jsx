@@ -141,7 +141,7 @@ function UserDashboard() {
           ) : draftPOs.length === 0 ? (
             <EmptyDataPrompt message="No drafted purchase orders found" />
           ) : (
-            <DraftPurchaseOrderTable data={draftPOs} />
+            <DraftPurchaseOrderTable data={draftPOs} onDraftSubmit={DraftSubmit}/>
           )}
         </div>
 
