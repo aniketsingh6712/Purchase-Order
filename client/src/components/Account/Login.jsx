@@ -9,22 +9,27 @@ function Login() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || "/dashboard";
+
   const submitHandler = (e) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
 
     loginFunc
-      .logUserIn({ userEmail, password })
+      .logUserIn({ email:userEmail, password })
       .then((response) => response.data)
       .then((data) => {
-        const { token } = data;
+        const { token,role } = data;
         sessionStorage.setItem("authToken", token);
+        sessionStorage.setItem("userRole", role);
         toast.success("Login successful!", { autoClose: 1500 });
         setTimeout(() => {
-          navigate(from, { replace: true }); //dashboard nav
+          if (role === "CREATOR") {
+          navigate("/dashboard", { replace: true });
+        } else if (role === "APPROVER") {
+          navigate("/approver", { replace: true });
+        }
+         
         }, 1500);
       })
       .catch((err) => {
@@ -49,7 +54,7 @@ function Login() {
             </label>
             <input
               type="text"
-              placeholder="Enter your email or username"
+              placeholder="Enter your email"
               value={userEmail}
               onChange={(e) => setUserEmail(e.target.value)}
               className="w-full px-4 py-2 rounded-lg border border-[#0066EE] text-[#0066EE] placeholder-[#0066EE] outline-none focus:ring-2 focus:ring-[#0066EE]"

@@ -45,15 +45,17 @@ router.post("/register", async (req, res) => {
 // Login route
 router.post("/login", async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+   
+    const { email, password } = req.body;
+    // attach role and based on that user will be send to diffrent dashboard
 
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ error: "Invalid email or password" });
 
-    // Check role
-    if (role && user.role !== role) {
-      return res.status(403).json({ error: `Access denied for role: ${user.role}` });
-    }
+    // // Check role
+    // if (role && user.role !== role) {
+    //   return res.status(403).json({ error: `Access denied for role: ${user.role}` });
+    // }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
@@ -67,6 +69,7 @@ router.post("/login", async (req, res) => {
     res.status(200).json({
       message: "Login successful",
       token,
+      role:user.role,
       user: {
         id: user._id,
         username: user.username,

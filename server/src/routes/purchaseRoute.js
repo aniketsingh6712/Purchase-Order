@@ -6,6 +6,7 @@ const { authenticateToken, roleCheck } = require("../middleware/auth");
 
 router.post("/po", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
   try {
+    console.log("bhf");
     const { title, description, amount } = req.body;
 
     const po = await PurchaseOrder.create({

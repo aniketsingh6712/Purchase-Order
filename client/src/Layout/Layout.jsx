@@ -99,39 +99,39 @@ function UserDashboard() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    amount: "",
-    comment:"",
+    amount: ""
   });
-
+  const token=sessionStorage.getItem("authToken");
+  
   const [showForm, setShowForm] = useState(false);
   const [editData, setEditData] = useState(null);
 
-  const [poToDelete, setPoToDelete] = useState(null);
+  
 
   const [draftPOs, setDraftPOs] = useState([]);
  
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [view, setView] = useState("approved"); // toggle Approved / Rejected
 // const { approvedPOs, rejectedPOs, loadingPos, error, refresh } = usePurchaseOrders();
  const approvedPOs = dummyPurchaseOrders.filter((po) => po.status === "APPROVED");
   const rejectedPOs = dummyPurchaseOrders.filter((po) => po.status === "REJECTED");
   // Fetch POs
   useEffect(() => {
-    const fetchPOs = async () => {
-      try {
-        setLoading(true);
-        const { data } = await axios.get("/api/purchase-orders"); // adjust backend route
-        setDraftPOs(data.filter((po) => po.status === "Draft"));
-        setApprovedPOs(data.filter((po) => po.status === "Approved"));
-        setRejectedPOs(data.filter((po) => po.status === "Rejected"));
-      } catch (err) {
-        toast.error("Failed to fetch purchase orders");
-      } finally {
-        setLoading(false);
-      }
-    };
+    // const fetchPOs = async () => {
+    //   try {
+    //     setLoading(true);
+    //     const { data } = await axios.get("/api/purchase-orders"); // adjust backend route
+    //     setDraftPOs(data.filter((po) => po.status === "Draft"));
+    //     setApprovedPOs(data.filter((po) => po.status === "Approved"));
+    //     setRejectedPOs(data.filter((po) => po.status === "Rejected"));
+    //   } catch (err) {
+    //     toast.error("Failed to fetch purchase orders");
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
 
-    fetchPOs();
+    // fetchPOs();
   }, []);
 
   
@@ -140,41 +140,45 @@ function UserDashboard() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("/api/purchase-orders", { ...formData, status: "Draft" });
-      toast.success("Purchase Order Drafted");
-      setShowForm(false);
-    } catch (err) {
-      toast.error("Failed to create purchase order");
-    }
-  };
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     await axios.post("/api/purchase-orders", { ...formData, status: "Draft" });
+  //     toast.success("Purchase Order Drafted");
+  //     setShowForm(false);
+  //   } catch (err) {
+  //     toast.error("Failed to create purchase order");
+  //   }
+  // };
 
-   const submitPurchaseOrder = async (id) => {
-    // try {
-    //   await axios.delete(`http://localhost:8080/api/activities/${id}`, {
-    //     headers: { Authorization: `Bearer ${token}` },
-    //     data: { date: today },
-    //   });
-    //   toast.success("Purchase order submitted successfully!");
-    //   fetchTodayActivities(); // Refresh after submit
-    // } catch (err) {
-    //   console.error("Error submitting purchase order", err);
-    //   toast.error("Failed to submit purchase order");
-    // }
-    console.log(id);
-  };
-  const confirmDelete = async () => {
+   const submitPurchaseOrder = async () => {
+    
     try {
-      await axios.delete(`/api/purchase-orders/${poToDelete}`);
-      toast.success("Purchase Order Deleted");
-      setShowConfirm(false);
-      setPoToDelete(null);
+      console.log(formData);
+      await axios.post(`http://localhost:3001/api/purchase/po`, 
+        formData,
+      {
+    headers: { Authorization: `Bearer ${token}` },
+      }
+      );
+      toast.success("Purchase order submitted successfully!");
+      
     } catch (err) {
-      toast.error("Failed to delete purchase order");
+      console.error("Error submitting purchase order", err);
+      toast.error("Failed to submit purchase order");
     }
+   
   };
+  // const confirmDelete = async () => {
+  //   try {
+  //     await axios.delete(`/api/purchase-orders/${poToDelete}`);
+  //     toast.success("Purchase Order Deleted");
+  //     setShowConfirm(false);
+  //     setPoToDelete(null);
+  //   } catch (err) {
+  //     toast.error("Failed to delete purchase order");
+  //   }
+  // };
 
   return (
     <>
@@ -199,7 +203,7 @@ function UserDashboard() {
         ) : draftPOs.length === 0 ? (
           // <EmptyDataPrompt message="No drafted purchase orders found" />
           <DraftPurchaseOrderTable onDelete={(id)=>{
-              submitPurchaseOrder(id);
+              // submitPurchaseOrder(id);
           }}/>
         ) : (
           <PurchaseOrderTable
@@ -279,7 +283,7 @@ function UserDashboard() {
       {(showForm || editData) && (
         <div className="fixed inset-0 bg-blue-500 bg-opacity-50 flex justify-center items-center z-50 p-2">
           <form
-            onSubmit={showForm ? handleSubmit : handleUpdate}
+            onSubmit={submitPurchaseOrder}
             className="bg-white p-4 sm:p-6 rounded-lg shadow max-w-md w-full space-y-4"
           >
             <ExpenseForm formData={formData} onChange={handleChange} />
@@ -296,7 +300,7 @@ function UserDashboard() {
                 type="submit"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full"
               >
-                {showForm ? "Submit" : "Update"}
+               Submit
               </button>
             </div>
           </form>

@@ -53,7 +53,7 @@ const ExpenseForm = ({ formData, onChange }) => {
         </div>
 
          {/* Comments */}
-        <div>
+        {/* <div>
           <label className="input-label-style">Comment</label>
           <textarea
             name="comment"
@@ -64,7 +64,7 @@ const ExpenseForm = ({ formData, onChange }) => {
             required
             className="w-full border rounded-md p-2 mt-1"
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );
