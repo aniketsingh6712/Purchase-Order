@@ -93,7 +93,7 @@ function UserDashboard() {
       await axios.post("http://localhost:3001/api/purchase/po", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success("Purchase order submitted successfully!");
+      toast.success("Purchase order drafted successfully!");
       setShowForm(false);
       setFormData({ title: "", description: "", amount: "" });
       await fetchPOs();
@@ -102,6 +102,17 @@ function UserDashboard() {
       toast.error("Failed to submit purchase order");
     }
   };
+
+  const DraftSubmit=async (id)=>{
+    try{
+      await axios.put(`"http://localhost:3001/api/purchase/po/${id}/submit`,{
+        headers:{Authorization:`Bearer ${token}`},
+      });
+       toast.success("Purchase order submitted successfully!");
+    }catch(err){
+      console.log(err);
+    }
+  }
 
   return (
     <>
