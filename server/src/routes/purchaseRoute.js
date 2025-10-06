@@ -103,39 +103,39 @@ router.put("/po/:id/reject", authenticateToken, roleCheck("APPROVER"), async (re
   }
 });
 
-// 📌 Get all POs (Dashboard)
-router.get("/", authenticateToken, async (req, res) => {
-  try {
-    const filter = {};
-    if (req.query.status) filter.status = req.query.status;
-    if (req.query.createdBy) filter.createdBy = req.query.createdBy;
+// // 📌 Get all POs (Dashboard)
+// router.get("/", authenticateToken, async (req, res) => {
+//   try {
+//     const filter = {};
+//     if (req.query.status) filter.status = req.query.status;
+//     if (req.query.createdBy) filter.createdBy = req.query.createdBy;
 
-    const pos = await PurchaseOrder.find(filter)
-      .populate("createdBy", "name email")
-      .populate("approvedBy", "name email")
-      .sort({ createdAt: -1 });
+//     const pos = await PurchaseOrder.find(filter)
+//       .populate("createdBy", "name email")
+//       .populate("approvedBy", "name email")
+//       .sort({ createdAt: -1 });
 
-    res.status(200).json(pos);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+//     res.status(200).json(pos);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
-// 📌 Get PO details (with history)
-router.get("/po/:id", authenticateToken, async (req, res) => {
-  try {
-    const po = await PurchaseOrder.findById(req.params.id)
-      .populate("createdBy", "name email")
-      .populate("assignedTo", "name email")
-      .populate("history.by", "name email");
+// // 📌 Get PO details (with history)
+// router.get("/po/:id", authenticateToken, async (req, res) => {
+//   try {
+//     const po = await PurchaseOrder.findById(req.params.id)
+//       .populate("createdBy", "name email")
+//       .populate("assignedTo", "name email")
+//       .populate("history.by", "name email");
 
-    if (!po) return res.status(404).json({ error: "PO not found" });
+//     if (!po) return res.status(404).json({ error: "PO not found" });
 
-    res.status(200).json(po);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+//     res.status(200).json(po);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 
 
@@ -156,20 +156,20 @@ router.get("/my", authenticateToken, async (req, res) => {
 });
 
 // Get all Approved and Rejected POs created by logged-in user
-router.get("/my/completed", authenticateToken, async (req, res) => {
-  try {
-    const completedPOs = await PurchaseOrder.find({
-      createdBy: req.user.userId,
-      status: { $in: ["APPROVED", "REJECTED"] } // filter approved and rejected
-    })
-      .populate("assignedTo", "name email")  // show approver info
-      .sort({ createdAt: -1 });             // latest first
+// router.get("/my/completed", authenticateToken, async (req, res) => {
+//   try {
+//     const completedPOs = await PurchaseOrder.find({
+//       createdBy: req.user.userId,
+//       status: { $in: ["APPROVED", "REJECTED"] } // filter approved and rejected
+//     })
+//       .populate("assignedTo", "name email")  // show approver info
+//       .sort({ createdAt: -1 });             // latest first
 
-    res.status(200).json(completedPOs);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+//     res.status(200).json(completedPOs);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 router.get("/approver/submitted", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
   try {
@@ -185,4 +185,88 @@ router.get("/approver/submitted", authenticateToken, roleCheck("APPROVER"), asyn
     res.status(500).json({ error: err.message });
   }
 });
+
+
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    // Optional query filters
+    const filter = {};
+    if (req.query.status) filter.status = req.query.status;
+    if (req.query.createdBy) filter.createdBy = req.query.createdBy;
+
+    // Fetch all purchase orders with related user data
+    const pos = await PurchaseOrder.find(filter)
+      .populate("createdBy", "name email")
+      .populate("approvedBy", "name email")
+      .populate("history.by", "name email")
+      .sort({ createdAt: -1 });
+
+    // Format data for frontend
+    const formattedList = pos.map(po => ({
+      id: po._id.toString(),
+      title: po.title,
+      description: po.description,
+      amount: po.amount,
+      createdBy: po.createdBy?.name || "Unknown",
+      status: po.status,
+      createdAt: po.createdAt,
+      history: po.history.map(h => ({
+        action: h.action,
+        by: h.by?.name || "Unknown",
+        comment: h.comment,
+        timestamp: h.timestamp
+      }))
+    }));
+
+    return res.status(200).json(formattedList);
+  } catch (err) {
+    console.error("Error fetching purchase orders:", err);
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+});
+
+
+router.get("/my/completed", authenticateToken, async (req, res) => {
+  try {
+    const completedPOs = await PurchaseOrder.find({
+      createdBy: req.user.userId,
+      status: { $in: ["APPROVED", "REJECTED"] }
+    })
+      .populate("createdBy", "name email")   // include creator info
+      .populate("approvedBy", "name email")  // include approver info
+      .sort({ createdAt: -1 });
+
+    // map to match dummy data structure
+    const formattedPOs = completedPOs.map(po => ({
+      _id: po._id,
+      title: po.title,
+      description: po.description,
+      amount: po.amount,
+      status: po.status,
+      createdBy: po.createdBy
+        ? { _id: po.createdBy._id, name: po.createdBy.name }
+        : null,
+      approvedBy: po.approvedBy
+        ? { _id: po.approvedBy._id, name: po.approvedBy.name }
+        : null,
+      history: po.history
+        ? po.history.map(h => ({
+            action: h.action,
+            by: h.by
+              ? { _id: h.by._id, name: h.by.name }
+              : null,
+            comment: h.comment || null,
+            timestamp: h.timestamp
+          }))
+        : []
+    }));
+
+    res.status(200).json(formattedPOs);
+  } catch (err) {
+    console.error("Error fetching completed POs:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 module.exports = router;
