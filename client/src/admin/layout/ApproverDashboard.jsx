@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import axios from "axios";
 import Navbar from "../../components/NavBar/navBar";
 import SubmittedPurchaseOrderTable from "../Layout component/submittedTable";
 import { toast } from "react-toastify";
@@ -165,14 +165,33 @@ function ApproverDashboard() {
   const [view, setView] = useState("approved");
  const approvedPOs = dummyPurchaseOrders.filter((po) => po.status === "APPROVED");
   const rejectedPOs = dummyPurchaseOrders.filter((po) => po.status === "REJECTED");
+
+  const getProcessedPOs = async () => {
+  try {
+    setLoading(true);
+    const token = sessionStorage.getItem("authToken");
+
+    const { data } = await axios.get("/api/purchase/approver/processed", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  // const approvedPOs = data.filter((po) => po.status === "APPROVED");
+  // const rejectedPOs = data.filter((po) => po.status === "REJECTED");
+
+    
+  } catch (err) {
+    toast.error("Failed to fetch processed POs");
+  } finally {
+    setLoading(false);
+  }
+};
   // Fetch submitted POs
   useEffect(() => {
     const fetchPOs = async () => {
       try {
         setLoading(true);
         // 🔹 Replace with backend API
-        // const { data } = await axios.get("/api/purchase-orders");
-        // setSubmittedPOs(data.filter((po) => po.status === "Submitted"));
+        // const { data } = await axios.get("/api/purchase/approver/submitted");
+        
         setSubmittedPOs(testData); // demo
       } catch (err) {
         toast.error("Failed to fetch submitted purchase orders");
@@ -183,6 +202,77 @@ function ApproverDashboard() {
 
     fetchPOs();
   }, []);
+  const approverHandler = async (id, comment) => {
+  try {
+    setLoading(true);
+
+    const token = sessionStorage.getItem("authToken");
+
+    // ✅ Approve PO API call
+    const { data } = await axios.put(
+      `/api/purchase/po/${id}/approve`,
+      { comment }, // optional approver comment
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    toast.success("Purchase Order approved successfully!");
+
+    // Optionally refresh the list of submitted POs
+    const { data: updatedList } = await axios.get(
+      `/api/purchase/approver/submitted`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    setSubmittedPOs(updatedList);
+  } catch (err) {
+    console.error(err);
+    toast.error(err.response?.data?.error || "Failed to approve PO");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const rejectionHandler = async (id, comment) => {
+  try {
+    setLoading(true);
+
+    const token = sessionStorage.getItem("authToken");
+
+    // ✅ Reject PO API call
+    const { data } = await axios.put(
+      `/api/purchase/po/${id}/reject`,
+      { comment }, // rejection reason or feedback
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    toast.info("Purchase Order rejected");
+
+    // Optionally refresh the list after rejection
+    const { data: updatedList } = await axios.get(
+      `/api/purchase/approver/submitted`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    setSubmittedPOs(updatedList);
+  } catch (err) {
+    console.error(err);
+    toast.error(err.response?.data?.error || "Failed to reject PO");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>
@@ -196,7 +286,7 @@ function ApproverDashboard() {
           {loading ? (
             <p className="text-center text-blue-600">Loading...</p>
           ) : (
-            <SubmittedPurchaseOrderTable data={submittedPOs} />
+            <SubmittedPurchaseOrderTable data={submittedPOs} approverHandler={approverHandler} rejectionHandler={rejectionHandler}/>
           )}
         </div>
 
@@ -227,31 +317,25 @@ function ApproverDashboard() {
       </div>
 
       {/* Error & Loading */}
-      {/* {error && (
-        <p className="text-center text-red-600 bg-red-100 p-2 rounded">{error}</p>
-      )}
+      
       {loading ? (
         <p className="text-center text-blue-600">Loading...</p>
       ) : view === "approved" ? (
         approvedPOs.length > 0 ? (
-          <PurchaseOrderTable data={approvedPOs} />
+           <ApproverOrRejectedOrderTable data={approvedPOs} />
         ) : (
           <div className="flex items-center gap-2 text-green-600 bg-green-50 border border-green-300 p-3 rounded-md">
             <CheckCircle /> No Approved Purchase Orders
           </div>
         )
       ) : rejectedPOs.length > 0 ? (
-        <PurchaseOrderTable data={rejectedPOs} />
+         <ApproverOrRejectedOrderTable data={rejectedPOs} />
       ) : (
         <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-300 p-3 rounded-md">
           <XCircle /> No Rejected Purchase Orders
         </div>
-      )} */}
-{view === "approved" ? (
-        <ApproverOrRejectedOrderTable data={approvedPOs} />
-      ) : (
-        <ApproverOrRejectedOrderTable data={rejectedPOs} />
       )}
+
     </div>
       </div>
     </>
