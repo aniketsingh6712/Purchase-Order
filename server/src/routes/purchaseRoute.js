@@ -37,9 +37,7 @@ router.put("/po/:id/submit", authenticateToken, roleCheck("CREATOR"), async (req
     }
 
     po.status = "SUBMITTED";
-    if (req.body.assignedTo) {
-      po.assignedTo = req.body.assignedTo;
-    }
+    
     po.history.push({
       action: "SUBMITTED",
       by: req.user.userId,
@@ -186,18 +184,19 @@ router.get("/my", authenticateToken, async (req, res) => {
 //   }
 // });
 
-
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    // Optional query filters
-    const filter = {};
-    if (req.query.status) filter.status = req.query.status;
-    if (req.query.createdBy) filter.createdBy = req.query.createdBy;
+    // Only fetch POs created by the logged-in user
+    const userId = req.user.userId; // assuming authenticateToken sets req.user
 
-    // Fetch all purchase orders with related user data
+    // Optional query filters
+    const filter = { createdBy: userId };
+    if (req.query.status) filter.status = req.query.status;
+
+    // Fetch all purchase orders created by this user with related user data
     const pos = await PurchaseOrder.find(filter)
       .populate("createdBy", "name email")
-      .populate("approvedBy", "name email")
+     
       .populate("history.by", "name email")
       .sort({ createdAt: -1 });
 
@@ -207,12 +206,12 @@ router.get("/", authenticateToken, async (req, res) => {
       title: po.title,
       description: po.description,
       amount: po.amount,
-      createdBy: po.createdBy?.name || "Unknown",
+      createdBy: po.createdBy?.username || "Unknown",
       status: po.status,
       createdAt: po.createdAt,
       history: po.history.map(h => ({
         action: h.action,
-        by: h.by?.name || "Unknown",
+        by: h.by?.username || "Unknown",
         comment: h.comment,
         timestamp: h.timestamp
       }))
@@ -220,10 +219,11 @@ router.get("/", authenticateToken, async (req, res) => {
 
     return res.status(200).json(formattedList);
   } catch (err) {
-    console.error("Error fetching purchase orders:", err);
+    console.error("Error fetching user purchase orders:", err);
     res.status(500).json({ error: "Server error: " + err.message });
   }
 });
+
 
 
 router.get("/my/completed", authenticateToken, async (req, res) => {
