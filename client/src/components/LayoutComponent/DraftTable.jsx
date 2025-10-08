@@ -1,38 +1,10 @@
 import React from "react";
-const dummyData = [
-    {
-      id: 1,
-      title: "Office Supplies",
-      description: "Notebooks, pens, and staplers",
-      amount: 1200,
-      status: "Draft",
-    },
-    {
-      id: 2,
-      title: "Laptop Purchase",
-      description: "Dell Inspiron for new hire",
-      amount: 55000,
-      status: "Draft",
-    },
-    {
-      id: 3,
-      title: "Furniture",
-      description: "Office chairs and desks",
-      amount: 20000,
-      status: "Draft",
-    },
-    {
-      id: 4,
-      title: "Snacks for Pantry",
-      description: "",
-      amount: 1500,
-      status: "Rejected",
-    },
-  ];
+
+
 const DraftPurchaseOrderTable = ({ data,onDraftSubmit }) => {
   // Filter only draft orders
-  const draftOrders = Array.isArray(dummyData)
-    ? dummyData.filter((order) => order.status === "Draft")
+  const draftOrders = Array.isArray(data)
+    ? data.filter((order) => order.status === "DRAFT")
     : [];
 
   return (
@@ -59,7 +31,7 @@ const DraftPurchaseOrderTable = ({ data,onDraftSubmit }) => {
             <tbody>
               {draftOrders.map((order) => (
                 <tr
-                  key={order.id}
+                  key={order._id}
                   className="border-b border-blue-600 hover:bg-gray-50 transition text-black"
                 >
                   <td className="py-2 px-4">{order.title}</td>
@@ -71,7 +43,7 @@ const DraftPurchaseOrderTable = ({ data,onDraftSubmit }) => {
                   </td>
                    <td className="py-2 px-4">
                     <button
-                      onClick={() => onDraftSubmit(order.id)}
+                      onClick={() => onDraftSubmit(order._id)}
                       className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
                     >
                       Submit Order

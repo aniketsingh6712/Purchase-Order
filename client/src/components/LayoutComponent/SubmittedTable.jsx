@@ -1,41 +1,13 @@
 import React from "react";
 
-const dummyData = [
-  {
-    id: 1,
-    title: "Office Supplies",
-    description: "Notebooks, pens, and staplers",
-    amount: 1200,
-    status: "Submitted",
-  },
-  {
-    id: 2,
-    title: "Laptop Purchase",
-    description: "Dell Inspiron for new hire",
-    amount: 55000,
-    status: "Draft",
-  },
-  {
-    id: 3,
-    title: "Furniture",
-    description: "Office chairs and desks",
-    amount: 20000,
-    status: "Submitted",
-  },
-  {
-    id: 4,
-    title: "Snacks for Pantry",
-    description: "",
-    amount: 1500,
-    status: "Rejected",
-  },
-];
+
 
 const SubmittedPurchaseOrderTable = ({ data }) => {
   // Filter only submitted orders
-  const submittedOrders = Array.isArray(dummyData)
-    ? dummyData.filter((order) => order.status === "Submitted")
+  const submittedOrders = Array.isArray(data)
+    ? data.filter((order) => order.status === "SUBMITTED")
     : [];
+
 
   return (
     <div className="relative mt-6 p-4 border rounded-md shadow-sm bg-white">

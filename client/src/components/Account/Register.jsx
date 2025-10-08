@@ -26,11 +26,18 @@ export default function Register() {
     if (!formData.username) {
       newErrors.username = "Username is required";
     }
+    const passwordRegex=/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+    if(!passwordRegex.test(formData.password)){
+      newErrors.password="must contain minimum 8 letters ,one uppercase,one lowercase,one special case and one digit"
+    }
 
     // Password match check
-    if (formData.password !== formData.confirmPassword) {
+    if(!newErrors.password){
+      if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
+    }
+    
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {

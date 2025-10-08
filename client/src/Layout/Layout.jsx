@@ -8,7 +8,7 @@ import ExpenseForm from "../components/LayoutComponent/form";
 import PurchaseOrderTable from "../components/LayoutComponent/PurchaseorderTable";
 import { toast } from "react-toastify";
 import Navbar from "../components/NavBar/navBar";
-import { dummyPurchaseOrders } from "../components/LayoutComponent/ApproverOrRejectedDummyData";
+// import { dummyPurchaseOrders } from "../components/LayoutComponent/ApproverOrRejectedDummyData";
 function UserDashboard() {
   const [formData, setFormData] = useState({
     title: "",
@@ -37,16 +37,17 @@ function UserDashboard() {
       setLoading(true);
 
       const [draftRes, submittedRes, completedRes] = await Promise.allSettled([
-        axios.get("/api/purchase/my?status=DRAFT", {
+        axios.get("http://localhost:3001/api/purchase/my?status=DRAFT", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get("/api/purchase/my?status=SUBMITTED", {
+        axios.get("http://localhost:3001/api/purchase/my?status=SUBMITTED", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get("/api/purchase/my/completed", {
+        axios.get("http://localhost:3001/api/purchase/my/completed", {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
+      
 
       if (draftRes.status === "fulfilled") {
         setDraftPOs(draftRes.value.data);
@@ -66,8 +67,8 @@ function UserDashboard() {
 
       if (completedRes.status === "fulfilled") {
         const completedData = completedRes.value.data;
-        setApprovedPOs(dummyPurchaseOrders.filter((po) => po.status === "APPROVED"));
-        setRejectedPOs(dummyPurchaseOrders.filter((po) => po.status === "REJECTED"));
+        setApprovedPOs(completedData.filter((po) => po.status === "APPROVED"));
+        setRejectedPOs(completedData.filter((po) => po.status === "REJECTED"));
       } else {
         console.error("Error fetching completed POs:", completedRes.reason);
         toast.error("Failed to fetch completed POs");
@@ -103,16 +104,22 @@ function UserDashboard() {
     }
   };
 
-  const DraftSubmit=async (id)=>{
-    try{
-      await axios.put(`"http://localhost:3001/api/purchase/po/${id}/submit`,{
-        headers:{Authorization:`Bearer ${token}`},
-      });
-       toast.success("Purchase order submitted successfully!");
-    }catch(err){
-      console.log(err);
-    }
+  const DraftSubmit = async (id) => {
+  try {
+    await axios.put(
+      `http://localhost:3001/api/purchase/po/${id}/submit`,
+      {}, // empty request body
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    toast.success("Purchase order submitted successfully!");
+    fetchPOs();
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+    toast.error("Failed to submit purchase order.");
   }
+};
 
   return (
     <>
