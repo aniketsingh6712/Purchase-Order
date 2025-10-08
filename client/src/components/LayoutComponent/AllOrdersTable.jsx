@@ -4,7 +4,7 @@ import testPurchaseOrders from "./testData";
 import StatusLegend from "./status";
 import Navbar from "../NavBar/navBar";
 
-
+import axios from "axios";
 
 const AllOrdersTable=()=>{
  const [data, setData] = useState([]);
@@ -15,21 +15,22 @@ const AllOrdersTable=()=>{
   const [error, setError] = useState("");
 
   const recordsPerPage = 10;
-  const API_URL = "http://localhost:5000/api/purchase/";
+  const API_URL = "http://localhost:3001/api/purchase/";
   useEffect(() => {
     const fetchPurchaseOrders = async () => {
       try {
         setLoading(true);
         const token = sessionStorage.getItem("authToken");
 
-        // const res = await axios.get(API_URL, {
-        //   headers: {
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        // });
-setData(testPurchaseOrders);
-        if (Array.isArray(testPurchaseOrders)) {
-          setData(testPurchaseOrders);
+        const res = await axios.get(API_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+       
+
+        if (Array.isArray(res.data)) {
+          setData(res.data);
         } else {
           console.warn("Unexpected API response:", testPurchaseOrders.data);
           setData([]);

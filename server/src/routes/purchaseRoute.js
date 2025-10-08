@@ -64,7 +64,9 @@ router.put("/po/:id/approve", authenticateToken, roleCheck("APPROVER"), async (r
     po.status = "APPROVED";
     po.history.push({
       action: "APPROVED",
-      by: req.user.userId,
+      by: {_id:req.user.userId,
+        username:req.user.username},
+      
       comment: req.body.comment,
       timestamp: new Date()
     });
@@ -89,7 +91,8 @@ router.put("/po/:id/reject", authenticateToken, roleCheck("APPROVER"), async (re
     po.status = "REJECTED";
     po.history.push({
       action: "REJECTED",
-      by: req.user.userId,
+      by: {_id:req.user.userId,
+        username:req.user.username},
       comment: req.body.comment,
       timestamp: new Date()
     });
@@ -100,24 +103,6 @@ router.put("/po/:id/reject", authenticateToken, roleCheck("APPROVER"), async (re
     res.status(500).json({ error: err.message });
   }
 });
-
-// // 📌 Get all POs (Dashboard)
-// router.get("/", authenticateToken, async (req, res) => {
-//   try {
-//     const filter = {};
-//     if (req.query.status) filter.status = req.query.status;
-//     if (req.query.createdBy) filter.createdBy = req.query.createdBy;
-
-//     const pos = await PurchaseOrder.find(filter)
-//       .populate("createdBy", "name email")
-//       .populate("approvedBy", "name email")
-//       .sort({ createdAt: -1 });
-
-//     res.status(200).json(pos);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
 
 // // 📌 Get PO details (with history)
 // router.get("/po/:id", authenticateToken, async (req, res) => {
@@ -153,76 +138,47 @@ router.get("/my", authenticateToken, async (req, res) => {
   }
 });
 
-// Get all Approved and Rejected POs created by logged-in user
-// router.get("/my/completed", authenticateToken, async (req, res) => {
+
+
+// router.get("/", authenticateToken, async (req, res) => {
 //   try {
-//     const completedPOs = await PurchaseOrder.find({
-//       createdBy: req.user.userId,
-//       status: { $in: ["APPROVED", "REJECTED"] } // filter approved and rejected
-//     })
-//       .populate("assignedTo", "name email")  // show approver info
-//       .sort({ createdAt: -1 });             // latest first
+//     // Only fetch POs created by the logged-in user
+//     const userId = req.user.userId; // assuming authenticateToken sets req.user
+//     const role=req.user.role;
+//     // Optional query filters
+//     const filter = { createdBy: userId };
+//     if (req.query.status) filter.status = req.query.status;
 
-//     res.status(200).json(completedPOs);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-// router.get("/approver/submitted", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
-//   try {
-//     const submittedPOs = await PurchaseOrder.find({
-      
-//       status: "SUBMITTED"
-//     })
-//       .populate("createdBy", "name email")  
-//       .sort({ createdAt: -1 });           
-
-//     res.status(200).json(submittedPOs);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-router.get("/", authenticateToken, async (req, res) => {
-  try {
-    // Only fetch POs created by the logged-in user
-    const userId = req.user.userId; // assuming authenticateToken sets req.user
-
-    // Optional query filters
-    const filter = { createdBy: userId };
-    if (req.query.status) filter.status = req.query.status;
-
-    // Fetch all purchase orders created by this user with related user data
-    const pos = await PurchaseOrder.find(filter)
-      .populate("createdBy", "name email")
+//     // Fetch all purchase orders created by this user with related user data
+//     const pos = await PurchaseOrder.find(filter)
+//       .populate("createdBy", "username email")
      
-      .populate("history.by", "name email")
-      .sort({ createdAt: -1 });
+//       .populate("history.by", "username email")
+//       .sort({ createdAt: -1 });
 
-    // Format data for frontend
-    const formattedList = pos.map(po => ({
-      id: po._id.toString(),
-      title: po.title,
-      description: po.description,
-      amount: po.amount,
-      createdBy: po.createdBy?.username || "Unknown",
-      status: po.status,
-      createdAt: po.createdAt,
-      history: po.history.map(h => ({
-        action: h.action,
-        by: h.by?.username || "Unknown",
-        comment: h.comment,
-        timestamp: h.timestamp
-      }))
-    }));
+//     // Format data for frontend
+//     const formattedList = pos.map(po => ({
+//       id: po._id.toString(),
+//       title: po.title,
+//       description: po.description,
+//       amount: po.amount,
+//       createdBy: po.createdBy?.username || "Unknown",
+//       status: po.status,
+//       createdAt: po.createdAt,
+//       history: po.history.map(h => ({
+//         action: h.action,
+//         by: h.by?.username || "Unknown",
+//         comment: h.comment,
+//         timestamp: h.timestamp
+//       }))
+//     }));
 
-    return res.status(200).json(formattedList);
-  } catch (err) {
-    console.error("Error fetching user purchase orders:", err);
-    res.status(500).json({ error: "Server error: " + err.message });
-  }
-});
+//     return res.status(200).json(formattedList);
+//   } catch (err) {
+//     console.error("Error fetching user purchase orders:", err);
+//     res.status(500).json({ error: "Server error: " + err.message });
+//   }
+// });
 
 
 
@@ -232,8 +188,8 @@ router.get("/my/completed", authenticateToken, async (req, res) => {
       createdBy: req.user.userId,
       status: { $in: ["APPROVED", "REJECTED"] }
     })
-      .populate("createdBy", "name email")   // include creator info
-      .populate("approvedBy", "name email")  // include approver info
+      .populate("createdBy", "username email")   // include creator info
+      .populate("approvedBy", "username email")  // include approver info
       .sort({ createdAt: -1 });
 
     // map to match dummy data structure
@@ -244,16 +200,16 @@ router.get("/my/completed", authenticateToken, async (req, res) => {
       amount: po.amount,
       status: po.status,
       createdBy: po.createdBy
-        ? { _id: po.createdBy._id, name: po.createdBy.name }
+        ? { _id: po.createdBy._id, username: po.createdBy.username }
         : null,
       approvedBy: po.approvedBy
-        ? { _id: po.approvedBy._id, name: po.approvedBy.name }
+        ? { _id: po.approvedBy._id, username: po.approvedBy.username }
         : null,
       history: po.history
         ? po.history.map(h => ({
             action: h.action,
             by: h.by
-              ? { _id: h.by._id, name: h.by.name }
+              ? { _id: h.by._id, username: h.by.username }
               : null,
             comment: h.comment || null,
             timestamp: h.timestamp
@@ -329,8 +285,8 @@ router.get(
           }
         }
       })
-        .populate("createdBy", "name email")
-        .populate("history.by", "name email")
+        .populate("createdBy", "username email")
+        .populate("history.by", "username email")
         .sort({ updatedAt: -1 });
 
       // Format response for frontend
@@ -341,11 +297,11 @@ router.get(
         amount: po.amount,
         status: po.status, // APPROVED or REJECTED
         createdBy: po.createdBy
-          ? { _id: po.createdBy._id, name: po.createdBy.name }
+          ? { _id: po.createdBy._id, username: po.createdBy.username }
           : null,
         history: po.history.map((h) => ({
           action: h.action,
-          by: h.by ? { _id: h.by._id, name: h.by.name } : null,
+          by: h.by ? { _id: h.by._id, username: h.by.username } : null,
           comment: h.comment || null,
           timestamp: h.timestamp,
         })),
@@ -361,6 +317,39 @@ router.get(
   }
 );
 
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId; // from token
+
+    // Fetch all POs created by this user
+    const pos = await PurchaseOrder.find({ createdBy: userId })
+      .populate("createdBy", "username email")
+      .populate("history.by", "username email")
+      .sort({ createdAt: -1 });
+
+    // Format for frontend
+    const formattedList = pos.map(po => ({
+      id: po._id.toString(),
+      title: po.title,
+      description: po.description,
+      amount: po.amount,
+      createdBy: po.createdBy?.username || "Unknown",
+      status: po.status,
+      createdAt: po.createdAt,
+      history: po.history.map(h => ({
+        action: h.action,
+        by: h.by?.username || "Unknown",
+        comment: h.comment,
+        timestamp: h.timestamp
+      }))
+    }));
+
+    res.status(200).json(formattedList);
+  } catch (err) {
+    console.error("Error fetching user purchase orders:", err);
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+});
 
 
 module.exports = router;

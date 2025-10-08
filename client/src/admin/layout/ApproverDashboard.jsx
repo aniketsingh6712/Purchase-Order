@@ -4,204 +4,90 @@ import Navbar from "../../components/NavBar/navBar";
 import SubmittedPurchaseOrderTable from "../Layout component/submittedTable";
 import { toast } from "react-toastify";
 import ApproverOrRejectedOrderTable from "../Layout component/approverOrRejected";
-// Dummy Data for demo (replace with backend API call)
-const dummyPurchaseOrders = [
-  {
-    _id: "po1",
-    title: "Office Chairs",
-    description: "Purchase of ergonomic chairs",
-    amount: 12000,
-    status: "APPROVED",
-    createdBy: { _id: "u1", name: "Alice Johnson" },
-    approvedBy: { _id: "u2", name: "Manager Bob" },
-    history: [
-      {
-        action: "CREATED",
-        by: { _id: "u1", name: "Alice Johnson" },
-        comment: "Requested chairs for new office",
-        timestamp: new Date("2025-09-20T09:30:00")
-      },
-      {
-        action: "SUBMITTED",
-        by: { _id: "u1", name: "Alice Johnson" },
-        timestamp: new Date("2025-09-20T10:00:00")
-      },
-      {
-        action: "APPROVED",
-        by: { _id: "u2", name: "Manager Bob" },
-        comment: "Approved for immediate purchase",
-        timestamp: new Date("2025-09-21T14:15:00")
-      }
-    ]
-  },
-  {
-    _id: "po2",
-    title: "Laptop Purchase",
-    description: "High-performance laptops for dev team",
-    amount: 350000,
-    status: "REJECTED",
-    createdBy: { _id: "u3", name: "Charlie Brown" },
-    approvedBy: null,
-    history: [
-      {
-        action: "CREATED",
-        by: { _id: "u3", name: "Charlie Brown" },
-        comment: "Requested laptops for development",
-        timestamp: new Date("2025-09-18T11:00:00")
-      },
-      {
-        action: "SUBMITTED",
-        by: { _id: "u3", name: "Charlie Brown" },
-        timestamp: new Date("2025-09-18T12:00:00")
-      },
-      {
-        action: "REJECTED",
-        by: { _id: "u2", name: "Manager Bob" },
-        comment: "Budget constraints, not approved",
-        timestamp: new Date("2025-09-19T15:45:00")
-      }
-    ]
-  },
-  {
-    _id: "po3",
-    title: "Printer Ink",
-    description: "Bulk ink cartridges",
-    amount: 2500,
-    status: "APPROVED",
-    createdBy: { _id: "u4", name: "David Smith" },
-    approvedBy: { _id: "u2", name: "Manager Bob" },
-    history: [
-      {
-        action: "CREATED",
-        by: { _id: "u4", name: "David Smith" },
-        timestamp: new Date("2025-09-15T09:00:00")
-      },
-      {
-        action: "APPROVED",
-        by: { _id: "u2", name: "Manager Bob" },
-        comment: "Small purchase, approved quickly",
-        timestamp: new Date("2025-09-15T10:30:00")
-      }
-    ]
-  }
-];
 
-const testData = [
-  {
-    _id: "1",
-    title: "Office Chairs",
-    description: "Ergonomic chairs for staff",
-    amount: 25000,
-    status: "Submitted",
-    history: [
-      {
-        action: "Created",
-        by: { name: "Alice Johnson" },
-        timestamp: new Date("2025-09-20T09:30:00"),
-        comment: "Initial request submitted.",
-      },
-      {
-        action: "Reviewed",
-        by: { name: "Bob Smith" },
-        timestamp: new Date("2025-09-22T11:15:00"),
-        comment: "Checked vendor pricing.",
-      },
-    ],
-  },
-  {
-    _id: "2",
-    title: "Laptops",
-    description: "Dell XPS 13 for development team",
-    amount: 150000,
-    status: "Submitted",
-    history: [
-      {
-        action: "Created",
-        by: { name: "Carol White" },
-        timestamp: new Date("2025-09-25T14:45:00"),
-        comment: "Urgent requirement for new hires.",
-      },
-    ],
-  },
-  {
-    _id: "3",
-    title: "Printer Ink",
-    description: "HP Toner Cartridges",
-    amount: 8000,
-    status: "Draft", // won't appear (only "Submitted" shown)
-    history: [
-      {
-        action: "Created",
-        by: { name: "David Lee" },
-        timestamp: new Date("2025-09-28T10:00:00"),
-      },
-    ],
-  },
-  {
-    _id: "4",
-    title: "Projector",
-    description: "Conference room projector replacement",
-    amount: 42000,
-    status: "Submitted",
-    history: [
-      {
-        action: "Created",
-        by: "System Auto",
-        timestamp: new Date("2025-09-29T08:20:00"),
-      },
-      {
-        action: "Reviewed",
-        by: { name: "Emily Clark" },
-        timestamp: new Date("2025-09-30T12:10:00"),
-        comment: "Checked compatibility with room setup.",
-      },
-    ],
-  },
-];
 
 function ApproverDashboard() {
   const [submittedPOs, setSubmittedPOs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState("approved");
- const approvedPOs = dummyPurchaseOrders.filter((po) => po.status === "APPROVED");
-  const rejectedPOs = dummyPurchaseOrders.filter((po) => po.status === "REJECTED");
+  const [approvedPOs,setApprovedPOs]=useState([]);
+  const [rejectedPOs,setRejectedPOs]=useState([]);
 
-  const getProcessedPOs = async () => {
-  try {
+  const fetchAllPOs = async () => {
     setLoading(true);
     const token = sessionStorage.getItem("authToken");
 
-    const { data } = await axios.get("/api/purchase/approver/processed", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-  // const approvedPOs = data.filter((po) => po.status === "APPROVED");
-  // const rejectedPOs = data.filter((po) => po.status === "REJECTED");
-
-    
-  } catch (err) {
-    toast.error("Failed to fetch processed POs");
-  } finally {
-    setLoading(false);
-  }
-};
-  // Fetch submitted POs
-  useEffect(() => {
-    const fetchPOs = async () => {
-      try {
-        setLoading(true);
-        // 🔹 Replace with backend API
-        // const { data } = await axios.get("/api/purchase/approver/submitted");
-        
-        setSubmittedPOs(testData); // demo
-      } catch (err) {
-        toast.error("Failed to fetch submitted purchase orders");
-      } finally {
-        setLoading(false);
+    try {
+      if (!token) {
+        throw new Error("Authentication token missing. Please log in again.");
       }
-    };
 
-    fetchPOs();
-  }, []);
+      // Run both API calls simultaneously
+      const [processedRes, submittedRes] = await Promise.allSettled([
+        axios.get("http://localhost:3001/api/purchase/approver/processed", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get("http://localhost:3001/api/purchase/approver/submitted", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      // Handle processed POs (Approved & Rejected)
+      if (processedRes.status === "fulfilled") {
+        const processedData = Array.isArray(processedRes.value.data)
+          ? processedRes.value.data
+          : [];
+        const approvedPOs = processedData.filter((po) => po.status === "APPROVED");
+        const rejectedPOs = processedData.filter((po) => po.status === "REJECTED");
+        setApprovedPOs(approvedPOs);
+        setRejectedPOs(rejectedPOs);
+      } else {
+        console.error("Processed POs fetch failed:", processedRes.reason);
+        toast.warn("Couldn't fetch processed POs — showing empty data");
+        setApprovedPOs([]);
+        setRejectedPOs([]);
+      }
+
+      // Handle submitted POs
+      if (submittedRes.status === "fulfilled") {
+        const submittedData = Array.isArray(submittedRes.value.data)
+          ? submittedRes.value.data
+          : [];
+        setSubmittedPOs(submittedData);
+      } else {
+        console.error("Submitted POs fetch failed:", submittedRes.reason);
+        toast.warn("Couldn't fetch submitted POs — using test data");
+        setSubmittedPOs([]); // fallback demo data
+      }
+
+    } catch (err) {
+      console.error("Critical error while fetching POs:", err);
+      if (err.response) {
+        // Server returned an error
+        toast.error(`Server Error: ${err.response.status} - ${err.response.data?.message || "Unknown"}`);
+      } else if (err.request) {
+        // No response from server
+        toast.error("Network error: Failed to connect to server");
+      } else {
+        // Something else (token, syntax, etc.)
+        toast.error(err.message);
+      }
+
+      // Safe fallback
+      setApprovedPOs([]);
+      setRejectedPOs([]);
+      setSubmittedPOs([]);
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+  
+  fetchAllPOs();
+}, []);
+
   const approverHandler = async (id, comment) => {
   try {
     setLoading(true);
@@ -210,7 +96,7 @@ function ApproverDashboard() {
 
     // ✅ Approve PO API call
     const { data } = await axios.put(
-      `/api/purchase/po/${id}/approve`,
+      `http://localhost:3001/api/purchase/po/${id}/approve`,
       { comment }, // optional approver comment
       {
         headers: {
@@ -221,15 +107,9 @@ function ApproverDashboard() {
 
     toast.success("Purchase Order approved successfully!");
 
-    // Optionally refresh the list of submitted POs
-    const { data: updatedList } = await axios.get(
-      `/api/purchase/approver/submitted`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    
 
-    setSubmittedPOs(updatedList);
+    fetchAllPOs();
   } catch (err) {
     console.error(err);
     toast.error(err.response?.data?.error || "Failed to approve PO");
@@ -246,7 +126,7 @@ const rejectionHandler = async (id, comment) => {
 
     // ✅ Reject PO API call
     const { data } = await axios.put(
-      `/api/purchase/po/${id}/reject`,
+      `http://localhost:3001/api/purchase/po/${id}/reject`,
       { comment }, // rejection reason or feedback
       {
         headers: {
@@ -257,15 +137,7 @@ const rejectionHandler = async (id, comment) => {
 
     toast.info("Purchase Order rejected");
 
-    // Optionally refresh the list after rejection
-    const { data: updatedList } = await axios.get(
-      `/api/purchase/approver/submitted`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    setSubmittedPOs(updatedList);
+    fetchAllPOs();
   } catch (err) {
     console.error(err);
     toast.error(err.response?.data?.error || "Failed to reject PO");
