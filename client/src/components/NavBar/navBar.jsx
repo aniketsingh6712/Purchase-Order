@@ -10,8 +10,8 @@ export default function Navbar({ menuItems = [] }) {
   const userRole = sessionStorage.getItem("userRole");
   const handleLogout = () => {
     sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("userRole"); // optional, if stored
-    navigate("/login");
+    sessionStorage.removeItem("userRole"); 
+    navigate("/");
   };
 
   const handleNavClick = (item) => {

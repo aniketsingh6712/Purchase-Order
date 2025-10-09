@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../models/userRecord"); // Mongoose model
-const { authenticateToken, roleCheck } = require("../middleware/auth");
+const User = require("../models/userRecord"); 
 
 // Register route
 router.post("/register", async (req, res) => {
