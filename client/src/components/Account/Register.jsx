@@ -65,7 +65,7 @@ export default function Register() {
         toast.success("Registered successfully!", { autoClose: 3000 });
 
         setTimeout(() => {
-          navigate("/login");
+          navigate("/");
         }, 2000);
       } catch (error) {
          if (
@@ -194,7 +194,7 @@ export default function Register() {
         <p className="text-center text-sm text-[#0066EE] mt-6">
           Already have an account?{" "}
           <NavLink
-            to="/login"
+            to="/"
             className="font-semibold underline hover:text-[#0055cc]"
           >
             Login here

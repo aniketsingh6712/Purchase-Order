@@ -141,8 +141,8 @@ router.put("/po/:id/reject", authenticateToken, roleCheck("APPROVER"), async (re
 
 
 
-// GET /api/po/my?status=DRAFT or status=SUBMITTED
-router.get("/my", authenticateToken, async (req, res) => {
+// /api/po/my?status=DRAFT or status=SUBMITTED  for creator
+router.get("/my", authenticateToken, roleCheck("CREATOR"),async (req, res) => {
   try {
     const filter = { createdBy: req.user.userId };
     if (req.query.status) filter.status = req.query.status;
@@ -161,7 +161,7 @@ router.get("/my", authenticateToken, async (req, res) => {
 
 
 //Approved or rejected Pos created By user
-router.get("/my/completed", authenticateToken, async (req, res) => {
+router.get("/my/completed", authenticateToken, roleCheck("CREATOR"),async (req, res) => {
   try {
     const completedPOs = await PurchaseOrder.find({
       createdBy: req.user.userId,
@@ -294,7 +294,7 @@ router.get(
 );
 
 // All the Pos created by user So far
-router.get("/", authenticateToken, async (req, res) => {
+router.get("/", authenticateToken,roleCheck("CREATOR"), async (req, res) => {
   try {
     const userId = req.user.userId; 
     const pos = await PurchaseOrder.find({ createdBy: userId })
