@@ -3,11 +3,11 @@ import { FaInfoCircle } from "react-icons/fa";
 import { X } from "lucide-react";
 
 const SubmittedPurchaseOrderTable = ({ data, approverHandler, rejectionHandler }) => {
-  const [selectedOrder, setSelectedOrder] = useState(null); // history modal
-  const [actionOrder, setActionOrder] = useState(null); // action popup
+  const [selectedOrder, setSelectedOrder] = useState(null); 
+  const [actionOrder, setActionOrder] = useState(null); 
   const [comment, setComment] = useState("");
 
-  // Pagination state
+  
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -15,7 +15,7 @@ const SubmittedPurchaseOrderTable = ({ data, approverHandler, rejectionHandler }
     ? data.filter((order) => order.status === "SUBMITTED")
     : [];
 
-  // Pagination logic
+ 
   const totalPages = Math.ceil(submittedOrders.length / itemsPerPage);
   const paginatedOrders = submittedOrders.slice(
     (currentPage - 1) * itemsPerPage,
@@ -119,10 +119,13 @@ const SubmittedPurchaseOrderTable = ({ data, approverHandler, rejectionHandler }
                     By: {h.by?.username || h.by?._id || "Unknown"} •{" "}
                     {new Date(h.timestamp).toLocaleString()}
                   </p>
-                  {h.comment && <p className="text-xs text-gray-600 mt-1">Comment: {h.comment}</p>}
+                  {h.comment && (
+                    <p className="text-xs text-gray-600 mt-1">Comment: {h.comment}</p>
+                  )}
                 </div>
               ))}
             </div>
+
 
             <button
               onClick={() => setSelectedOrder(null)}

@@ -13,13 +13,13 @@ function App() {
     <Router>
         <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
-        {/* Default route */}
+        
        
 
-        {/* Login route */}
+       
         <Route path="/login" element={<Login />} />
 
-        {/* Signup route */}
+       
         <Route path="/signup" element={<Register />} />
 
         <Route path="/dashboard" element={<UserDashboard />} />

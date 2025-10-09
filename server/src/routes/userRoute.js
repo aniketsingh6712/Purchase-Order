@@ -23,7 +23,7 @@ router.post("/register", async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      role: role || "CREATOR", // default role if not provided
+      role: role || "CREATOR", 
     });
 
     await newUser.save();
@@ -47,15 +47,12 @@ router.post("/login", async (req, res) => {
   try {
    
     const { email, password } = req.body;
-    // attach role and based on that user will be send to diffrent dashboard
+   
 
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ error: "Invalid email or password" });
 
-    // // Check role
-    // if (role && user.role !== role) {
-    //   return res.status(403).json({ error: `Access denied for role: ${user.role}` });
-    // }
+    
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
@@ -82,17 +79,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Profile route
-router.get("/profile", authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId).select("-password"); // exclude password
-    if (!user) return res.status(404).json({ error: "User not found" });
 
-    res.status(200).json({ user });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 
 

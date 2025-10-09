@@ -22,7 +22,7 @@ function ApproverDashboard() {
         throw new Error("Authentication token missing. Please log in again.");
       }
 
-      // Run both API calls simultaneously
+      
       const [processedRes, submittedRes] = await Promise.allSettled([
         axios.get("http://localhost:3001/api/purchase/approver/processed", {
           headers: { Authorization: `Bearer ${token}` },
@@ -32,7 +32,7 @@ function ApproverDashboard() {
         }),
       ]);
 
-      // Handle processed POs (Approved & Rejected)
+      
       if (processedRes.status === "fulfilled") {
         const processedData = Array.isArray(processedRes.value.data)
           ? processedRes.value.data
@@ -48,7 +48,7 @@ function ApproverDashboard() {
         setRejectedPOs([]);
       }
 
-      // Handle submitted POs
+      
       if (submittedRes.status === "fulfilled") {
         const submittedData = Array.isArray(submittedRes.value.data)
           ? submittedRes.value.data
@@ -57,23 +57,23 @@ function ApproverDashboard() {
       } else {
         console.error("Submitted POs fetch failed:", submittedRes.reason);
         toast.warn("Couldn't fetch submitted POs — using test data");
-        setSubmittedPOs([]); // fallback demo data
+        setSubmittedPOs([]); 
       }
 
     } catch (err) {
       console.error("Critical error while fetching POs:", err);
       if (err.response) {
-        // Server returned an error
+        
         toast.error(`Server Error: ${err.response.status} - ${err.response.data?.message || "Unknown"}`);
       } else if (err.request) {
-        // No response from server
+        
         toast.error("Network error: Failed to connect to server");
       } else {
-        // Something else (token, syntax, etc.)
+        
         toast.error(err.message);
       }
 
-      // Safe fallback
+     
       setApprovedPOs([]);
       setRejectedPOs([]);
       setSubmittedPOs([]);
@@ -94,10 +94,10 @@ function ApproverDashboard() {
 
     const token = sessionStorage.getItem("authToken");
 
-    // ✅ Approve PO API call
-    const { data } = await axios.put(
+    
+    await axios.put(
       `http://localhost:3001/api/purchase/po/${id}/approve`,
-      { comment }, // optional approver comment
+      { comment }, 
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -124,10 +124,10 @@ const rejectionHandler = async (id, comment) => {
 
     const token = sessionStorage.getItem("authToken");
 
-    // ✅ Reject PO API call
-    const { data } = await axios.put(
+    
+  await axios.put(
       `http://localhost:3001/api/purchase/po/${id}/reject`,
-      { comment }, // rejection reason or feedback
+      { comment }, 
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -148,7 +148,7 @@ const rejectionHandler = async (id, comment) => {
 
   return (
     <>
-      <Navbar />
+     <Navbar menuItems={["Home"]}/>
       <div className="p-4 sm:p-6 mt-5 max-w-6xl mx-auto space-y-6">
         <h2 className="text-2xl font-bold text-green-600">
           Approver Dashboard
@@ -164,7 +164,7 @@ const rejectionHandler = async (id, comment) => {
 
          {/* Approved & Rejected Purchase Orders */}
       <div className="bg-white p-4 rounded-lg shadow space-y-4">
-      {/* Buttons */}
+     
       <div className="flex gap-2">
         <button
           onClick={() => setView("approved")}
@@ -188,20 +188,20 @@ const rejectionHandler = async (id, comment) => {
         </button>
       </div>
 
-      {/* Error & Loading */}
+      {/*  Loading */}
       
       {loading ? (
         <p className="text-center text-blue-600">Loading...</p>
       ) : view === "approved" ? (
         approvedPOs.length > 0 ? (
-           <ApproverOrRejectedOrderTable data={approvedPOs} />
+           <ApproverOrRejectedOrderTable data={approvedPOs} view={view}/>
         ) : (
           <div className="flex items-center gap-2 text-green-600 bg-green-50 border border-green-300 p-3 rounded-md">
             <CheckCircle /> No Approved Purchase Orders
           </div>
         )
       ) : rejectedPOs.length > 0 ? (
-         <ApproverOrRejectedOrderTable data={rejectedPOs} />
+         <ApproverOrRejectedOrderTable data={rejectedPOs} view={view}/>
       ) : (
         <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-300 p-3 rounded-md">
           <XCircle /> No Rejected Purchase Orders

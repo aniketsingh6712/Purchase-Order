@@ -3,7 +3,7 @@ import React from "react";
 
 
 const SubmittedPurchaseOrderTable = ({ data }) => {
-  // Filter only submitted orders
+  
   const submittedOrders = Array.isArray(data)
     ? data.filter((order) => order.status === "SUBMITTED")
     : [];

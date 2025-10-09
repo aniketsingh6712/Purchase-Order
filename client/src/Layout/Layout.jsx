@@ -8,7 +8,7 @@ import ExpenseForm from "../components/LayoutComponent/form";
 import PurchaseOrderTable from "../components/LayoutComponent/PurchaseorderTable";
 import { toast } from "react-toastify";
 import Navbar from "../components/NavBar/navBar";
-// import { dummyPurchaseOrders } from "../components/LayoutComponent/ApproverOrRejectedDummyData";
+
 function UserDashboard() {
   const [formData, setFormData] = useState({
     title: "",
@@ -17,7 +17,7 @@ function UserDashboard() {
   });
 
   const [showForm, setShowForm] = useState(false);
-  const [view, setView] = useState("approved"); // toggle Approved / Rejected
+  const [view, setView] = useState("approved"); 
 
   const [draftPOs, setDraftPOs] = useState([]);
   const [submittedPOs, setSubmittedPOs] = useState([]);
@@ -31,7 +31,7 @@ function UserDashboard() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Fetch all PO data with per-request error handling
+  
   const fetchPOs = useCallback(async () => {
     try {
       setLoading(true);
@@ -87,7 +87,7 @@ function UserDashboard() {
     fetchPOs();
   }, [fetchPOs]);
 
-  // 🧾 Submit new Purchase Order
+  //Submit new Purchase Order
   const submitPurchaseOrder = async (e) => {
     e.preventDefault();
     try {
@@ -104,11 +104,13 @@ function UserDashboard() {
     }
   };
 
+  //draft 
   const DraftSubmit = async (id) => {
+     if (!window.confirm("Are you sure you want to submit this Purchase Order?")) return;
   try {
     await axios.put(
       `http://localhost:3001/api/purchase/po/${id}/submit`,
-      {}, // empty request body
+      {}, 
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -121,9 +123,28 @@ function UserDashboard() {
   }
 };
 
+//delete
+const DeletePOs = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this Purchase Order?")) return;
+
+    try {
+      
+
+      await axios.delete(`http://localhost:3001/api/purchase/po/${id}/delete`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+     
+      setDraftPOs((prev) => prev.filter((po) => po._id !== id));
+
+      toast.success("Purchase Order deleted successfully");
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to delete PO");
+    }
+  };
   return (
     <>
-      <Navbar />
+      <Navbar menuItems={["Home", "Orders"]}/>
       <div className="p-4 sm:p-6 mt-5 max-w-5xl mx-auto space-y-6">
         <h2 className="text-2xl font-bold text-blue-600">
           Purchase Order Dashboard
@@ -148,7 +169,7 @@ function UserDashboard() {
           ) : draftPOs.length === 0 ? (
             <EmptyDataPrompt message="No drafted purchase orders found" />
           ) : (
-            <DraftPurchaseOrderTable data={draftPOs} onDraftSubmit={DraftSubmit}/>
+            <DraftPurchaseOrderTable data={draftPOs} onDraftSubmit={DraftSubmit} onDeletePOs={DeletePOs}/>
           )}
         </div>
 
@@ -189,14 +210,14 @@ function UserDashboard() {
             <p className="text-center text-blue-600">Loading...</p>
           ) : view === "approved" ? (
             approvedPOs.length > 0 ? (
-              <PurchaseOrderTable data={approvedPOs} />
+              <PurchaseOrderTable data={approvedPOs} view={view}/>
             ) : (
               <div className="flex items-center gap-2 text-green-600 bg-green-50 border border-green-300 p-3 rounded-md">
                 <CheckCircle /> No Approved Purchase Orders
               </div>
             )
           ) : rejectedPOs.length > 0 ? (
-            <PurchaseOrderTable data={rejectedPOs} />
+            <PurchaseOrderTable data={rejectedPOs} view={view}/>
           ) : (
             <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-300 p-3 rounded-md">
               <XCircle /> No Rejected Purchase Orders

@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const ApproverOrRejectedOrderTable = ({ data }) => {
+const ApproverOrRejectedOrderTable = ({ data,view }) => {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  // Pagination state
+  
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
-
-  // Pagination logic
+  useEffect(()=>{
+    setCurrentPage(1)
+  },[view])
+  
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const paginatedOrders = data.slice(
     (currentPage - 1) * itemsPerPage,
@@ -64,7 +66,7 @@ const ApproverOrRejectedOrderTable = ({ data }) => {
         </tbody>
       </table>
 
-      {/* Pagination controls */}
+   
       {data.length > itemsPerPage && (
         <div className="flex justify-between mt-4">
           <button
@@ -95,7 +97,7 @@ const ApproverOrRejectedOrderTable = ({ data }) => {
         </div>
       )}
 
-      {/* History Modal */}
+      
       {selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white w-96 rounded-lg shadow-lg p-6 relative">

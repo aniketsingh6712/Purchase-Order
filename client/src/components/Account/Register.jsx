@@ -60,7 +60,7 @@ export default function Register() {
 
         console.log("Sending cleanedFormData:", cleanedFormData);
 
-        const response = await registerFunc.registerUser(cleanedFormData);
+        await registerFunc.registerUser(cleanedFormData);
 
         toast.success("Registered successfully!", { autoClose: 3000 });
 

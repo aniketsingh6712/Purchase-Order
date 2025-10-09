@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaInfoCircle } from "react-icons/fa";
-import testPurchaseOrders from "./testData";
+
 import StatusLegend from "./status";
 import Navbar from "../NavBar/navBar";
 
@@ -32,7 +32,7 @@ const AllOrdersTable=()=>{
         if (Array.isArray(res.data)) {
           setData(res.data);
         } else {
-          console.warn("Unexpected API response:", testPurchaseOrders.data);
+          console.warn("Unexpected API response:", res.data);
           setData([]);
         }
       } catch (err) {
@@ -77,9 +77,9 @@ const AllOrdersTable=()=>{
      
 
            <>
-      <Navbar />
+      <Navbar menuItems={["Home", "Orders"]}/>
       <div className="relative mt-6 p-4 m-2 border rounded-md shadow-sm bg-white">
-        {/* Controls */}
+        
         <div className="flex justify-between items-center mb-6">
           <button
             onClick={() => setAscending(!ascending)}
@@ -90,7 +90,7 @@ const AllOrdersTable=()=>{
           <StatusLegend />
         </div>
 
-        {/* Loading / Error states */}
+       
         {loading ? (
           <p className="text-center text-gray-500 mt-4">Loading purchase orders...</p>
         ) : error ? (
@@ -138,7 +138,7 @@ const AllOrdersTable=()=>{
               </table>
             </div>
 
-            {/* Pagination */}
+            
             <div className="mt-4 flex justify-center items-center gap-4">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
@@ -169,7 +169,7 @@ const AllOrdersTable=()=>{
           </>
         )}
 
-        {/* Popup Modal with History */}
+       
         {selectedOrder && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
             <div className="bg-white p-6 rounded-md shadow-lg w-[450px] max-h-[80vh] overflow-y-auto relative">

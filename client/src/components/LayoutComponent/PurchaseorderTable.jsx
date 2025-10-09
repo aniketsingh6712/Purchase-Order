@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const PurchaseOrderTable = ({ data }) => {
+const PurchaseOrderTable = ({ data ,view}) => {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  // Pagination state
+ 
   const [currentPage, setCurrentPage] = useState(1);
+  useEffect(()=>{
+    setCurrentPage(1);
+  },[view]);
   const itemsPerPage = 3;
 
-  // Pagination logic
+  
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const paginatedOrders = data.slice(
     (currentPage - 1) * itemsPerPage,
@@ -27,7 +30,7 @@ const PurchaseOrderTable = ({ data }) => {
             <th className="py-2 px-4">Amount</th>
             <th className="py-2 px-4">Created By</th>
             <th className="py-2 px-4">Status</th>
-            <th className="py-2 px-4">Actions</th>
+            <th className="py-2 px-4">Information</th>
           </tr>
         </thead>
         <tbody>
