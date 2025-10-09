@@ -24,7 +24,7 @@ const purchaseOrderSchema = new mongoose.Schema({
   },
 
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // approver (optional)
+
 
   history: [historySchema]
 }, { timestamps: true });

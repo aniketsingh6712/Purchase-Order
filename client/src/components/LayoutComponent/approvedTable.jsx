@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 const StatusPurchaseOrderTable = ({ data }) => {
-  const [status, setStatus] = useState("Approved"); // Default view
+  const [status, setStatus] = useState("Approved"); 
   const [filteredOrders, setFilteredOrders] = useState([]);
 
   useEffect(() => {

@@ -3,13 +3,13 @@ import React from "react";
 const ExpenseForm = ({ formData, onChange }) => {
   return (
     <div className="space-y-4">
-      {/* Heading */}
+      
       <div className="flex items-center gap-2 text-xl font-semibold mb-2">
         <span>Expense Tracker</span>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {/* Title */}
+        
         <div>
           <label className="input-label-style">Title</label>
           <input
@@ -52,19 +52,7 @@ const ExpenseForm = ({ formData, onChange }) => {
           />
         </div>
 
-         {/* Comments */}
-        {/* <div>
-          <label className="input-label-style">Comment</label>
-          <textarea
-            name="comment"
-            value={formData.comment}
-            onChange={onChange}
-            placeholder="e.g. we need asap"
-            rows={1}
-            required
-            className="w-full border rounded-md p-2 mt-1"
-          />
-        </div> */}
+       
       </div>
     </div>
   );

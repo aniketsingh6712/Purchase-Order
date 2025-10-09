@@ -1,8 +1,8 @@
 import React from "react";
+import { FaTrash } from "react-icons/fa";
 
-
-const DraftPurchaseOrderTable = ({ data,onDraftSubmit }) => {
-  // Filter only draft orders
+const DraftPurchaseOrderTable = ({ data,onDraftSubmit ,onDeletePOs}) => {
+ 
   const draftOrders = Array.isArray(data)
     ? data.filter((order) => order.status === "DRAFT")
     : [];
@@ -41,7 +41,15 @@ const DraftPurchaseOrderTable = ({ data,onDraftSubmit }) => {
                   <td className="py-2 px-4 text-yellow-600 font-semibold">
                     {order.status}
                   </td>
-                   <td className="py-2 px-4">
+                   <td className="py-2 px-1">
+                    
+   <button
+    onClick={()=>onDeletePOs(order._id)}
+    className="p-2 mx-4 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+    title="Delete"
+  >
+    <FaTrash size={14} />
+  </button>
                     <button
                       onClick={() => onDraftSubmit(order._id)}
                       className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"

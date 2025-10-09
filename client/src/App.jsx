@@ -1,32 +1,40 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/Account/Login";
 import Register from "./components/Account/Register"; 
-import Navbar from "./components/NavBar/navBar";
+
 import UserDashboard from "./Layout/Layout";
 import AllOrdersTable from "./components/LayoutComponent/AllOrdersTable";
 import ApproverDashboard from "./admin/layout/ApproverDashboard";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ProtectedRoute from "./Protected";
 function App() {
   return (
     <Router>
-        <ToastContainer position="top-right" autoClose={3000} />
+       
       <Routes>
-        {/* Default route */}
+        
        
 
-        {/* Login route */}
-        <Route path="/login" element={<Login />} />
+       
+        <Route path="/" element={<Login />} />
 
-        {/* Signup route */}
+       
         <Route path="/signup" element={<Register />} />
 
-        <Route path="/dashboard" element={<UserDashboard />} />
-        <Route path="/orders" element={<AllOrdersTable/>}/>
-        <Route path="/approver" element={<ApproverDashboard/>}/>
+        <Route path="/dashboard" element={
+          <ProtectedRoute allowedRoles={["CREATOR"]}><UserDashboard /></ProtectedRoute>
+          } />
+        <Route path="/orders" element={
+          <ProtectedRoute allowedRoles={["CREATOR"]}><AllOrdersTable/></ProtectedRoute>
+          }/>
+        <Route path="/approver" element={
+          <ProtectedRoute allowedRoles={["APPROVER"]}><ApproverDashboard/></ProtectedRoute>
+          }/>
 
       </Routes>
+       <ToastContainer position="top-right" autoClose={3000} />
     </Router>
   );
 }
