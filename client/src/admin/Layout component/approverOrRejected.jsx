@@ -29,7 +29,7 @@ const ApproverOrRejectedOrderTable = ({ data,view }) => {
             <th className="py-2 px-4">Amount</th>
             <th className="py-2 px-4">Created By</th>
             <th className="py-2 px-4">Status</th>
-            <th className="py-2 px-4">Actions</th>
+            <th className="py-2 px-4">Information</th>
           </tr>
         </thead>
         <tbody>

@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userRecord"); 
+const { authenticateToken } = require("../middleware/auth");
 
 // Register route
 router.post("/register", async (req, res) => {
@@ -78,8 +79,16 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
-
+router.get("/role", authenticateToken, async (req, res) => {
+  try {
+    
+  
+    res.json(req.user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 
