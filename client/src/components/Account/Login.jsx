@@ -21,7 +21,7 @@ function Login() {
       .then((data) => {
         const { token,role } = data;
         sessionStorage.setItem("authToken", token);
-        sessionStorage.setItem("userRole", role);
+        // sessionStorage.setItem("userRole", role);
         toast.success("Login successful!", { autoClose: 1500 });
         setTimeout(() => {
           if (role === "CREATOR") {

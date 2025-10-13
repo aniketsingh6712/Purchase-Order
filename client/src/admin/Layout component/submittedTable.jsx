@@ -10,14 +10,16 @@ const SubmittedPurchaseOrderTable = ({ data, approverHandler, rejectionHandler }
   
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
+const [searchTerm, setSearchTerm] = useState("");
   const submittedOrders = Array.isArray(data)
     ? data.filter((order) => order.status === "SUBMITTED")
     : [];
-
+ const filteredOrders = submittedOrders.filter((order) =>
+    order.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
  
-  const totalPages = Math.ceil(submittedOrders.length / itemsPerPage);
-  const paginatedOrders = submittedOrders.slice(
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -27,11 +29,25 @@ const SubmittedPurchaseOrderTable = ({ data, approverHandler, rejectionHandler }
 
   return (
     <div className="relative mt-6 p-4 border rounded-md shadow-sm bg-white">
-      <h2 className="text-lg font-semibold text-green-700 mb-4">
-        Submitted Purchase Orders
-      </h2>
+       <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold text-green-700">
+          Submitted Purchase Orders
+        </h2>
 
-      {submittedOrders.length === 0 ? (
+        {/* 🔍 Search bar */}
+        <input
+          type="text"
+          placeholder="Search by title..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1); // reset to first page on search
+          }}
+          className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+      </div>
+
+      {filteredOrders.length === 0 ? (
         <p className="text-center text-gray-500">No submitted purchase orders found.</p>
       ) : (
         <>

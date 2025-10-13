@@ -77,9 +77,7 @@ export default function Navbar({ menuItems = [] }) {
           {menuItems.map((item, idx) => (
             <button
               key={idx}
-              onClick={() =>
-                handleNavClick(`/${item.toLowerCase().replace(/\s+/g, "-")}`)
-              }
+             onClick={() => handleNavClick(item)}
               className="hover:bg-white hover:text-black rounded-lg px-3 py-2 text-left"
             >
               {item}

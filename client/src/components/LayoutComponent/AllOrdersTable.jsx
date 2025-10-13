@@ -1,37 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { FaInfoCircle } from "react-icons/fa";
-
 import StatusLegend from "./status";
 import Navbar from "../NavBar/navBar";
-
 import axios from "axios";
 
-const AllOrdersTable=()=>{
- const [data, setData] = useState([]);
+const AllOrdersTable = () => {
+  const [data, setData] = useState([]);
   const [ascending, setAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const recordsPerPage = 10;
   const API_URL = "http://localhost:3001/api/purchase/";
+
   useEffect(() => {
     const fetchPurchaseOrders = async () => {
       try {
         setLoading(true);
         const token = sessionStorage.getItem("authToken");
-
         const res = await axios.get(API_URL, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-       
-
-        if (Array.isArray(res.data)) {
-          setData(res.data);
-        } else {
+        if (Array.isArray(res.data)) setData(res.data);
+        else {
           console.warn("Unexpected API response:", res.data);
           setData([]);
         }
@@ -42,20 +37,33 @@ const AllOrdersTable=()=>{
         setLoading(false);
       }
     };
-
     fetchPurchaseOrders();
   }, []);
 
+  // Sort by date
   const sortedRecords = [...data].sort((a, b) =>
     ascending
       ? new Date(a.createdAt) - new Date(b.createdAt)
       : new Date(b.createdAt) - new Date(a.createdAt)
   );
 
-  const totalPages = Math.ceil(sortedRecords.length / recordsPerPage);
+  // Filter by status and search
+  const filteredRecords = sortedRecords.filter((order) => {
+    const matchesStatus =
+      statusFilter === "All" || order.status === statusFilter;
+    const matchesSearch =
+      order.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.createdBy?.name || "")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
+
+  // Pagination
+  const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = sortedRecords.slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = filteredRecords.slice(indexOfFirstRecord, indexOfLastRecord);
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -73,30 +81,51 @@ const AllOrdersTable=()=>{
   };
 
   return (
-     <>
-     
-
-           <>
-      <Navbar menuItems={["Home", "Orders"]}/>
+    <>
+      <Navbar menuItems={["Home", "Orders"]} />
       <div className="relative mt-6 p-4 m-2 border rounded-md shadow-sm bg-white">
-        
-        <div className="flex justify-between items-center mb-6">
-          <button
-            onClick={() => setAscending(!ascending)}
-            className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-          >
-            Sort by Date {ascending ? "▼" : "▲"}
-          </button>
-          <StatusLegend />
+        {/* Top Controls */}
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setAscending(!ascending)}
+              className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+            >
+              Sort by Date {ascending ? "▼" : "▲"}
+            </button>
+
+            {/* Dropdown  */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              <option value="All">All POs</option>
+              <option value="DRAFT">Draft</option>
+              <option value="SUBMITTED">Submitted</option>
+              <option value="APPROVED">Approved</option>
+              <option value="REJECTED">Rejected</option>
+            </select>
+          </div>
+
+          {/* Search Bar */}
+          <input
+            type="text"
+            placeholder="Search by title ..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
         </div>
 
        
+        {/* table */}
         {loading ? (
           <p className="text-center text-gray-500 mt-4">Loading purchase orders...</p>
         ) : error ? (
           <p className="text-center text-red-500 mt-4">{error}</p>
         ) : currentRecords.length === 0 ? (
-          <p className="text-center text-gray-500 mt-4">No purchase orders found.</p>
+          <p className="text-center text-blue-500 mt-4">No purchase orders found.</p>
         ) : (
           <>
             <div className="overflow-x-auto">
@@ -138,7 +167,7 @@ const AllOrdersTable=()=>{
               </table>
             </div>
 
-            
+            {/* pagination */}
             <div className="mt-4 flex justify-center items-center gap-4">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
@@ -160,7 +189,7 @@ const AllOrdersTable=()=>{
                 className={`px-4 py-2 rounded-md ${
                   currentPage === totalPages
                     ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer "
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
               >
                 Next
@@ -169,7 +198,7 @@ const AllOrdersTable=()=>{
           </>
         )}
 
-       
+        {/* Modal */}
         {selectedOrder && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
             <div className="bg-white p-6 rounded-md shadow-lg w-[450px] max-h-[80vh] overflow-y-auto relative">
@@ -210,7 +239,6 @@ const AllOrdersTable=()=>{
           </div>
         )}
       </div>
-    </>
     </>
   );
 };

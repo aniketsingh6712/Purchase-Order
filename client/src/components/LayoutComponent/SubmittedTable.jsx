@@ -11,9 +11,7 @@ const SubmittedPurchaseOrderTable = ({ data }) => {
 
   return (
     <div className="relative mt-6 p-4 border rounded-md shadow-sm bg-white">
-      <h2 className="text-lg font-semibold text-green-700 mb-4">
-        Submitted Purchase Orders
-      </h2>
+      
 
       {submittedOrders.length === 0 ? (
         <p className="text-center text-gray-500">
