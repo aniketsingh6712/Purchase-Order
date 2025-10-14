@@ -3,7 +3,7 @@ const router = express.Router();
 const PurchaseOrder = require("../models/purchaseRecord");
 const { authenticateToken, roleCheck } = require("../middleware/auth");
 
-//draft Pos
+//draft Purchase Order
 router.post("/po", authenticateToken,roleCheck(["APPROVER", "CREATOR"]), async (req, res) => {
   try {
    
@@ -37,18 +37,17 @@ router.delete(
       const { id } = req.params;
       const userId = req.user.userId;
 
-      // Find the PO
       const po = await PurchaseOrder.findById(id);
       if (!po) {
         return res.status(404).json({ error: "Purchase order not found" });
       }
 
-      // Ensure only the creator can delete their draft
+     
       if (po.createdBy.toString() !== userId) {
         return res.status(403).json({ error: "Not authorized to delete this PO" });
       }
 
-      // Allow deletion only if it's in DRAFT state
+      
       if (po.status !== "DRAFT") {
         return res.status(400).json({ error: "Only draft POs can be deleted" });
       }

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Plus, CheckCircle, XCircle } from "lucide-react";
 import axios from "axios";
-import EmptyDataPrompt from "../components/EmptyDataPrompt";
-import DraftPurchaseOrderTable from "../components/LayoutComponent/DraftTable";
-import SubmittedPurchaseOrderTable from "../components/LayoutComponent/SubmittedTable";
-import ExpenseForm from "../components/LayoutComponent/form";
-import PurchaseOrderTable from "../components/LayoutComponent/PurchaseorderTable";
+import EmptyDataPrompt from "../EmptyData/EmptyDataPrompt";
+import DraftPurchaseOrderTable from "./LayoutComponent/DraftTable";
+import SubmittedPurchaseOrderTable from "./LayoutComponent/SubmittedTable";
+import ExpenseForm from "./LayoutComponent/form";
+import PurchaseOrderTable from "./LayoutComponent/PurchaseorderTable";
 import { toast } from "react-toastify";
 
 

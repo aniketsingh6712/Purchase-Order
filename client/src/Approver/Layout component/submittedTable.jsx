@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaInfoCircle } from "react-icons/fa";
 import { X } from "lucide-react";
-
+import { File} from "lucide-react";
 const SubmittedPurchaseOrderTable = ({ data, approverHandler, rejectionHandler }) => {
   const [selectedOrder, setSelectedOrder] = useState(null); 
   const [actionOrder, setActionOrder] = useState(null); 
@@ -41,14 +41,16 @@ const [searchTerm, setSearchTerm] = useState("");
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
-            setCurrentPage(1); // reset to first page on search
+            setCurrentPage(1);
           }}
           className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
       </div>
 
       {filteredOrders.length === 0 ? (
-        <p className="text-center text-gray-500">No submitted purchase orders found.</p>
+        <div className="flex items-center gap-2 text-green-600 bg-green-50 border border-green-300 p-3 rounded-md">
+                <File /> No Submitted Purchase Order found...
+              </div>
       ) : (
         <>
           <div className="overflow-x-auto">

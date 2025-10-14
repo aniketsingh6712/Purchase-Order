@@ -1,16 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./components/Account/Login";
-import Register from "./components/Account/Register"; 
+import Login from "./Register&Login/Login";
+import Register from "./Register&Login/Register"; 
 
-import UserDashboard from "./Layout/Layout";
-import AllOrdersTable from "./components/LayoutComponent/AllOrdersTable";
-import ApproverDashboard from "./admin/layout/ApproverDashboard";
+import UserDashboard from "./PurchaseOrder/Layout";
+import AllOrdersTable from "./PurchaseOrder/LayoutComponent/AllOrdersTable";
+import ApproverDashboard from "./Approver/layout/ApproverDashboard";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoute from "./Protected";
-import AdminDashboard from "./components/Admin/admin";
-import Navbar from "./components/NavBar/navBar";
+import AdminDashboard from "./Admin/admin";
+import Navbar from "./NavBar/navBar";
 function App() {
   return (
     <Router>

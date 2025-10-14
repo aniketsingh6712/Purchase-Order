@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../../components/NavBar/navBar";
+import Navbar from "../../NavBar/navBar";
 import SubmittedPurchaseOrderTable from "../Layout component/submittedTable";
 import { toast } from "react-toastify";
 import ApproverOrRejectedOrderTable from "../Layout component/approverOrRejected";

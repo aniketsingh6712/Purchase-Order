@@ -8,22 +8,22 @@ const { authenticateToken } = require("../middleware/auth");
 // Register route
 router.post("/register", async (req, res) => {
   try {
-    const { username, email, password, role } = req.body;
+    const { username, email, password } = req.body;
 
-    // Check if email already exists
+    
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: "Email already in use" });
     }
 
-    // Hash the password
+    
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
-      role: role || "CREATOR", 
+      role: "CREATOR", 
     });
 
     await newUser.save();
@@ -79,6 +79,8 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+//for role
 router.get("/role", authenticateToken, async (req, res) => {
   try {
     

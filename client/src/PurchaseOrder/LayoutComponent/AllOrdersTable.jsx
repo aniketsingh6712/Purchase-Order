@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FaInfoCircle } from "react-icons/fa";
 import StatusLegend from "./status";
-import Navbar from "../NavBar/navBar";
+import Navbar from "../../NavBar/navBar";
 import axios from "axios";
-
+import { Trash } from "lucide-react";
 const AllOrdersTable = () => {
   const [data, setData] = useState([]);
   const [ascending, setAscending] = useState(true);
@@ -129,7 +129,9 @@ const AllOrdersTable = () => {
         ) : error ? (
           <p className="text-center text-red-500 mt-4">{error}</p>
         ) : currentRecords.length === 0 ? (
-          <p className="text-center text-blue-500 mt-4">No purchase orders found.</p>
+           <div className="flex items-center gap-2 text-blue-700 bg-blue-300 border border-blue-400 p-3 rounded-md">
+                <Trash  /> No Purchase Order found.
+              </div>
         ) : (
           <>
             <div className="overflow-x-auto">

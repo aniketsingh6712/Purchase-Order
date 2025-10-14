@@ -5,7 +5,7 @@ const { authenticateToken, roleCheck } = require("../middleware/auth");
 //  Get all users (Admin only)
 router.get("/",authenticateToken,roleCheck("ADMIN"), async (req, res) => {
   try {
-    const users = await User.find({ role: { $ne: "ADMIN" } }).select("-password"); // exclude password
+    const users = await User.find({ role: { $ne: "ADMIN" } }).select("-password"); 
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Error fetching users", error: error.message });
@@ -50,7 +50,7 @@ router.delete("/:id", authenticateToken, roleCheck("ADMIN"), async (req, res) =>
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Prevent deleting admin users
+    
     if (user.role === "ADMIN") {
       return res.status(403).json({ message: "Cannot delete admin user" });
     }

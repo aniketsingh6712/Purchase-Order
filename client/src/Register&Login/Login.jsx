@@ -33,12 +33,12 @@ function Login() {
           navigate("/admin",{replace:true});
         }
          
-        }, 1500);
+        }, 500);
       })
       .catch((err) => {
         console.error("Login failed:", err);
         toast.error("Login failed! Please check your credentials", {
-          autoClose: 2000,
+          autoClose: 1500,
         });
         setLoading(false);
       });
