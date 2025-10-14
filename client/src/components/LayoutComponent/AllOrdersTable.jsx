@@ -82,9 +82,13 @@ const AllOrdersTable = () => {
 
   return (
     <>
-      <Navbar menuItems={["Home", "Orders"]} />
+              <h2 className="text-2xl font-bold text-blue-600 my-3">
+          Created Orders
+        </h2>
+      {/* <Navbar menuItems={["Home", "Orders"]} /> */}
       <div className="relative mt-6 p-4 m-2 border rounded-md shadow-sm bg-white">
         {/* Top Controls */}
+
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
           <div className="flex items-center gap-3">
             <button

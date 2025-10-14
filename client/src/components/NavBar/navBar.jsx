@@ -3,7 +3,7 @@ import { FaBars, FaTimes } from "react-icons/fa";
 
 
 import { useNavigate } from "react-router-dom";
-
+import { Outlet } from "react-router-dom";
 export default function Navbar({ menuItems = [] }) {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
@@ -23,7 +23,15 @@ export default function Navbar({ menuItems = [] }) {
       else if (userRole === "CREATOR") path = "/dashboard";
       else if(userRole=="ADMIN") path="/admin";
       else path = "/"; 
-    } else {
+    }
+    else if(item.toLowerCase()=="pos"){
+      path='/approver/pos';
+    } 
+    else if(item.toLowerCase()=="orders"){
+       if (userRole === "APPROVER") path = "/approver/orders";
+      else if (userRole === "CREATOR") path = "/orders";
+    }
+    else {
      
       path = `/${item.toLowerCase().replace(/\s+/g, "-")}`;
     }
@@ -32,6 +40,7 @@ export default function Navbar({ menuItems = [] }) {
     setIsOpen(false);
   };
   return (
+    <>
     <nav className="w-full bg-[linear-gradient(200deg,_#0066EE_60%,_#9383FB_100%)] text-white">
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
         {/* Logo */}
@@ -94,5 +103,9 @@ export default function Navbar({ menuItems = [] }) {
         </div>
       )}
     </nav>
+     <div style={{ padding: "20px" }}>
+        <Outlet />
+      </div>
+      </>
   );
 }

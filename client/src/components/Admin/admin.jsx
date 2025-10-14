@@ -58,9 +58,9 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div>
-        <Navbar menuItems={["Home"]}/> 
-        <h2 className="text-2xl font-bold text-blue-600 my-3">
+    <>
+       
+        <h2 className="text-3xl font-bold text-blue-600 my-3 ms-4">
           Admin Dashboard
         </h2>
       <AdminUserTable
@@ -68,7 +68,7 @@ const AdminDashboard = () => {
         onChangeRole={handleChangeRole}
         onDeleteUser={handleDeleteUser}
       />
-    </div>
+    </>
   );
 };
 

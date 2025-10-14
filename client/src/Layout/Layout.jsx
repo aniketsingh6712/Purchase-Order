@@ -144,7 +144,7 @@ const DeletePOs = async (id) => {
   };
   return (
     <>
-      <Navbar menuItems={["Home", "Orders"]}/>
+      {/* <Navbar menuItems={["Home", "Orders"]}/> */}
       <div className="p-4 sm:p-6 mt-5 max-w-5xl mx-auto space-y-6">
         <h2 className="text-2xl font-bold text-blue-600">
           Purchase Order Dashboard
