@@ -7,7 +7,9 @@ import SubmittedPurchaseOrderTable from "../components/LayoutComponent/Submitted
 import ExpenseForm from "../components/LayoutComponent/form";
 import PurchaseOrderTable from "../components/LayoutComponent/PurchaseorderTable";
 import { toast } from "react-toastify";
-import Navbar from "../components/NavBar/navBar";
+
+
+
 
 function UserDashboard() {
   const [formData, setFormData] = useState({
@@ -24,19 +26,20 @@ function UserDashboard() {
   const [approvedPOs, setApprovedPOs] = useState([]);
   const [rejectedPOs, setRejectedPOs] = useState([]);
   const [loading, setLoading] = useState(false);
-
+ 
   const token = sessionStorage.getItem("authToken");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  
+ 
   const fetchPOs = useCallback(async () => {
     try {
       setLoading(true);
 
       const [draftRes, submittedRes, completedRes] = await Promise.allSettled([
+        
         axios.get("http://localhost:3001/api/purchase/my?status=DRAFT", {
           headers: { Authorization: `Bearer ${token}` },
         }),
@@ -47,6 +50,7 @@ function UserDashboard() {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
+     
       
 
       if (draftRes.status === "fulfilled") {
@@ -83,8 +87,11 @@ function UserDashboard() {
     }
   }, [token]);
 
+  
   useEffect(() => {
+ 
     fetchPOs();
+    
   }, [fetchPOs]);
 
   //Submit new Purchase Order

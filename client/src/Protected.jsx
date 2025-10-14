@@ -36,7 +36,7 @@ import { toast } from "react-toastify";
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const navigate = useNavigate();
   const token = sessionStorage.getItem("authToken");
-
+  const OriginalRole=sessionStorage.getItem("userRole");
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [redirectPath, setRedirectPath] = useState(null);
 
@@ -58,6 +58,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
         const data = await response.json();
         const role = data.role;
+        
         sessionStorage.setItem("userRole", role);
 
         if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {

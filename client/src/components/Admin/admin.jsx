@@ -38,13 +38,16 @@ const AdminDashboard = () => {
       setUsers((prev) =>
         prev.map((u) => (u._id === userId ? { ...u, role: newRole } : u))
       );
+      toast.success("user role now has been changed");
     } catch (error) {
       console.error("Error updating role:", error);
+      toast.error(error);
     }
   };
 
   //  Handle delete user
   const handleDeleteUser = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user")) return;
     try {
       await axios.delete(`${API_BASE}/${userId}`,
          {
@@ -52,8 +55,10 @@ const AdminDashboard = () => {
         }
       );
       setUsers((prev) => prev.filter((u) => u._id !== userId));
+      toast.success("User is now deleted");
     } catch (error) {
       console.error("Error deleting user:", error);
+      toast.error(error);
     }
   };
 
