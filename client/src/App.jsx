@@ -9,6 +9,7 @@ import ApproverDashboard from "./admin/layout/ApproverDashboard";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoute from "./Protected";
+import AdminDashboard from "./components/Admin/admin";
 function App() {
   return (
     <Router>
@@ -32,7 +33,12 @@ function App() {
         <Route path="/approver" element={
           <ProtectedRoute allowedRoles={["APPROVER"]}><ApproverDashboard/></ProtectedRoute>
           }/>
-
+      <Route path="/admin" element={
+        <ProtectedRoute allowedRoles={["ADMIN"]}>
+        <AdminDashboard/>
+         </ProtectedRoute>
+        }/>
+       
       </Routes>
        <ToastContainer position="top-right" autoClose={3000} />
     </Router>

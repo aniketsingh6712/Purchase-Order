@@ -64,6 +64,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
           toast.warning("You are not authorized to access this page");
           if (role === "CREATOR") setRedirectPath("/dashboard");
           else if (role === "APPROVER") setRedirectPath("/approver");
+          else if(role=="ADMIN") setRedirectPath("/admin");
           return;
         }
 

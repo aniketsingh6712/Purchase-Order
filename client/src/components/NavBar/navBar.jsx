@@ -21,6 +21,7 @@ export default function Navbar({ menuItems = [] }) {
     
       if (userRole === "APPROVER") path = "/approver";
       else if (userRole === "CREATOR") path = "/dashboard";
+      else if(userRole=="ADMIN") path="/admin";
       else path = "/"; 
     } else {
      
