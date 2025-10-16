@@ -48,7 +48,7 @@ router.post("/login", async (req, res) => {
    
     const { email, password } = req.body;
    
-
+    
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ error: "Invalid email or password" });
 
@@ -62,6 +62,32 @@ router.post("/login", async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
     );
+
+    
+  // const accessToken = jwt.sign(
+  //   { userId: user._id, email: user.email, role: user.role },
+  //   process.env.ACCESS_TOKEN_SECRET,
+  //   { expiresIn: "2m" } 
+  // );
+    
+  // const refreshToken = jwt.sign(
+  //   { userId: user._id, email: user.email, role: user.role },
+  //   process.env.REFRESH_TOKEN_SECRET,
+  //   { expiresIn: "7d" } 
+  // );
+
+  // // Store tokens in secure httpOnly cookies
+  // res.cookie("accessToken", accessToken, {
+    
+  //   maxAge: 15 * 60 * 1000, // 1 minutes
+  // });
+
+  // res.cookie("refreshToken", refreshToken, {
+   
+  //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  // });
+
+  
 
     res.status(200).json({
       message: "Login successful",
@@ -92,6 +118,10 @@ router.get("/role", authenticateToken, async (req, res) => {
   }
 });
 
-
+router.post("/logout", (req, res) => {
+  res.clearCookie("accessToken", { httpOnly: true, sameSite: "None", secure: true });
+  res.clearCookie("refreshToken", { httpOnly: true, sameSite: "None", secure: true });
+  res.json({ message: "Logged out successfully" });
+});
 
 module.exports = router;

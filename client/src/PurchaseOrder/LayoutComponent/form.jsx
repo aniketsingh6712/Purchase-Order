@@ -5,7 +5,7 @@ const ExpenseForm = ({ formData, onChange }) => {
     <div className="space-y-4">
       
       <div className="flex items-center gap-2 text-xl font-semibold mb-2">
-        <span>Expense Tracker</span>
+        <span>Purchase Order</span>
       </div>
 
       <div className="grid grid-cols-1 gap-4">

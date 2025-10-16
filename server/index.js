@@ -4,11 +4,15 @@ const mongoose=require("mongoose")
 const userRecordRouter=require("./src/routes/userRoute");
 const purchaseRecordRouter=require("./src/routes/purchaseRoute");
 const adminRecordRouter=require("./src/routes/adminRoute");
+var cookieParser = require('cookie-parser')
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173", // your frontend URL
+    credentials: true, // ✅ Allow cookies
+  }));
 require("dotenv").config();
 app.use(express.json());
-
+app.use(cookieParser());
 const port = process.env.PORT || 3001;
 
 
