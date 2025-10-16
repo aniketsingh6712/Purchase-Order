@@ -21,7 +21,7 @@ function Login() {
       .then((data) => {
         const { token,role } = data;
         sessionStorage.setItem("authToken", token);
-        // sessionStorage.setItem("userRole", role);
+        sessionStorage.setItem("userRole", role);
         toast.success("Login successful!", { autoClose: 1500 });
         setTimeout(() => {
           if (role === "CREATOR") {
@@ -29,13 +29,16 @@ function Login() {
         } else if (role === "APPROVER") {
           navigate("/approver", { replace: true });
         }
+        else if(role=="ADMIN"){
+          navigate("/admin",{replace:true});
+        }
          
-        }, 1500);
+        }, 500);
       })
       .catch((err) => {
         console.error("Login failed:", err);
         toast.error("Login failed! Please check your credentials", {
-          autoClose: 2000,
+          autoClose: 1500,
         });
         setLoading(false);
       });

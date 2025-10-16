@@ -3,6 +3,7 @@ const cors = require("cors");
 const mongoose=require("mongoose")
 const userRecordRouter=require("./src/routes/userRoute");
 const purchaseRecordRouter=require("./src/routes/purchaseRoute");
+const adminRecordRouter=require("./src/routes/adminRoute");
 const app = express();
 app.use(cors());
 require("dotenv").config();
@@ -19,7 +20,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 app.use("/api/user", userRecordRouter);
 app.use("/api/purchase", purchaseRecordRouter);
-
+app.use("/api/admin",adminRecordRouter)
 
 
 app.listen(port, () => {

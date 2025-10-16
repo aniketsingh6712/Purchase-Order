@@ -3,10 +3,10 @@ const router = express.Router();
 const PurchaseOrder = require("../models/purchaseRecord");
 const { authenticateToken, roleCheck } = require("../middleware/auth");
 
-//draft Pos
-router.post("/po", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
+//draft Purchase Order
+router.post("/po", authenticateToken,roleCheck(["APPROVER", "CREATOR"]), async (req, res) => {
   try {
-    
+   
     const { title, description, amount } = req.body;
 
     const po = await PurchaseOrder.create({
@@ -30,24 +30,24 @@ router.post("/po", authenticateToken, roleCheck("CREATOR"), async (req, res) => 
 router.delete(
   "/po/:id/delete",
   authenticateToken,
-  roleCheck("CREATOR"),
+  roleCheck(["APPROVER", "CREATOR"]),
+
   async (req, res) => {
     try {
       const { id } = req.params;
       const userId = req.user.userId;
 
-      // Find the PO
       const po = await PurchaseOrder.findById(id);
       if (!po) {
         return res.status(404).json({ error: "Purchase order not found" });
       }
 
-      // Ensure only the creator can delete their draft
+     
       if (po.createdBy.toString() !== userId) {
         return res.status(403).json({ error: "Not authorized to delete this PO" });
       }
 
-      // Allow deletion only if it's in DRAFT state
+      
       if (po.status !== "DRAFT") {
         return res.status(400).json({ error: "Only draft POs can be deleted" });
       }
@@ -62,7 +62,7 @@ router.delete(
 );
 
 //  Submit PO (Creator only)
-router.put("/po/:id/submit", authenticateToken, roleCheck("CREATOR"), async (req, res) => {
+router.put("/po/:id/submit", authenticateToken, roleCheck(["APPROVER", "CREATOR"]), async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id);
     if (!po) return res.status(404).json({ error: "PO not found" });
@@ -87,7 +87,7 @@ router.put("/po/:id/submit", authenticateToken, roleCheck("CREATOR"), async (req
 });
 
 //Approve PO (Approver only)
-router.put("/po/:id/approve", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
+router.put("/po/:id/approve", authenticateToken, roleCheck(["APPROVER"]), async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id);
     if (!po) return res.status(404).json({ error: "PO not found" });
@@ -114,7 +114,7 @@ router.put("/po/:id/approve", authenticateToken, roleCheck("APPROVER"), async (r
 });
 
 //Reject PO (Approver only)
-router.put("/po/:id/reject", authenticateToken, roleCheck("APPROVER"), async (req, res) => {
+router.put("/po/:id/reject", authenticateToken, roleCheck(["APPROVER"]), async (req, res) => {
   try {
     const po = await PurchaseOrder.findById(req.params.id);
     if (!po) return res.status(404).json({ error: "PO not found" });
@@ -142,7 +142,7 @@ router.put("/po/:id/reject", authenticateToken, roleCheck("APPROVER"), async (re
 
 
 // /api/po/my?status=DRAFT or status=SUBMITTED  for creator
-router.get("/my", authenticateToken, roleCheck("CREATOR"),async (req, res) => {
+router.get("/my", authenticateToken,roleCheck(["APPROVER", "CREATOR"]), async (req, res) => {
   try {
     const filter = { createdBy: req.user.userId };
     if (req.query.status) filter.status = req.query.status;
@@ -161,7 +161,7 @@ router.get("/my", authenticateToken, roleCheck("CREATOR"),async (req, res) => {
 
 
 //Approved or rejected Pos created By user
-router.get("/my/completed", authenticateToken, roleCheck("CREATOR"),async (req, res) => {
+router.get("/my/completed", authenticateToken, roleCheck(["APPROVER", "CREATOR"]),async (req, res) => {
   try {
     const completedPOs = await PurchaseOrder.find({
       createdBy: req.user.userId,
@@ -206,11 +206,14 @@ router.get("/my/completed", authenticateToken, roleCheck("CREATOR"),async (req, 
 router.get(
   "/approver/submitted",
   authenticateToken,
-  roleCheck("APPROVER"),
+  roleCheck(["APPROVER"]),
   async (req, res) => {
     try {
       
-      const submittedPOs = await PurchaseOrder.find({ status: "SUBMITTED" })
+       const submittedPOs = await PurchaseOrder.find({
+        status: "SUBMITTED",
+        createdBy: { $ne: req.user.userId }, // exclude POs created by current user
+      })
         .populate("createdBy", "username email")
         .populate("history.by", "username email")
         .sort({ createdAt: -1 });
@@ -247,7 +250,7 @@ router.get(
 router.get(
   "/approver/processed",
   authenticateToken,
-  roleCheck("APPROVER"),
+  roleCheck(["APPROVER"]),
   async (req, res) => {
     try {
       const approverId = req.user.userId;
@@ -294,7 +297,7 @@ router.get(
 );
 
 // All the Pos created by user So far
-router.get("/", authenticateToken,roleCheck("CREATOR"), async (req, res) => {
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId; 
     const pos = await PurchaseOrder.find({ createdBy: userId })

@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Plus, CheckCircle, XCircle } from "lucide-react";
 import axios from "axios";
-import EmptyDataPrompt from "../components/EmptyDataPrompt";
-import DraftPurchaseOrderTable from "../components/LayoutComponent/DraftTable";
-import SubmittedPurchaseOrderTable from "../components/LayoutComponent/SubmittedTable";
-import ExpenseForm from "../components/LayoutComponent/form";
-import PurchaseOrderTable from "../components/LayoutComponent/PurchaseorderTable";
+import EmptyDataPrompt from "../EmptyData/EmptyDataPrompt";
+import DraftPurchaseOrderTable from "./LayoutComponent/DraftTable";
+import SubmittedPurchaseOrderTable from "./LayoutComponent/SubmittedTable";
+import ExpenseForm from "./LayoutComponent/form";
+import PurchaseOrderTable from "./LayoutComponent/PurchaseorderTable";
 import { toast } from "react-toastify";
-import Navbar from "../components/NavBar/navBar";
+
+
+
 
 function UserDashboard() {
   const [formData, setFormData] = useState({
@@ -24,19 +26,20 @@ function UserDashboard() {
   const [approvedPOs, setApprovedPOs] = useState([]);
   const [rejectedPOs, setRejectedPOs] = useState([]);
   const [loading, setLoading] = useState(false);
-
+ 
   const token = sessionStorage.getItem("authToken");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  
+ 
   const fetchPOs = useCallback(async () => {
     try {
       setLoading(true);
 
       const [draftRes, submittedRes, completedRes] = await Promise.allSettled([
+        
         axios.get("http://localhost:3001/api/purchase/my?status=DRAFT", {
           headers: { Authorization: `Bearer ${token}` },
         }),
@@ -47,6 +50,7 @@ function UserDashboard() {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
+     
       
 
       if (draftRes.status === "fulfilled") {
@@ -83,8 +87,11 @@ function UserDashboard() {
     }
   }, [token]);
 
+  
   useEffect(() => {
+ 
     fetchPOs();
+    
   }, [fetchPOs]);
 
   //Submit new Purchase Order
@@ -144,7 +151,7 @@ const DeletePOs = async (id) => {
   };
   return (
     <>
-      <Navbar menuItems={["Home", "Orders"]}/>
+      {/* <Navbar menuItems={["Home", "Orders"]}/> */}
       <div className="p-4 sm:p-6 mt-5 max-w-5xl mx-auto space-y-6">
         <h2 className="text-2xl font-bold text-blue-600">
           Purchase Order Dashboard

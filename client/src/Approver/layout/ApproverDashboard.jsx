@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../../components/NavBar/navBar";
+import Navbar from "../../NavBar/navBar";
 import SubmittedPurchaseOrderTable from "../Layout component/submittedTable";
 import { toast } from "react-toastify";
 import ApproverOrRejectedOrderTable from "../Layout component/approverOrRejected";
 
-
+import { CheckCircle, XCircle } from "lucide-react";
 function ApproverDashboard() {
   const [submittedPOs, setSubmittedPOs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -148,7 +148,7 @@ const rejectionHandler = async (id, comment) => {
 
   return (
     <>
-     <Navbar menuItems={["Home"]}/>
+
       <div className="p-4 sm:p-6 mt-5 max-w-6xl mx-auto space-y-6">
         <h2 className="text-2xl font-bold text-green-600">
           Approver Dashboard

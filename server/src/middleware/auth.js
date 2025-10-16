@@ -17,15 +17,19 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Middleware to check role
-const roleCheck = (role) => {
+
+
+const roleCheck = (roles) => {
   return (req, res, next) => {
-    if (req.user.role !== role) {
+    const allowedRoles = Array.isArray(roles) ? roles : [roles];
+    if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({ error: "Forbidden: insufficient role" });
     }
+
     next();
   };
 };
 
-// Export both functions
+
+
 module.exports = { authenticateToken, roleCheck };

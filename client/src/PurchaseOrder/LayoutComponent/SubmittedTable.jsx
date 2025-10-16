@@ -1,6 +1,6 @@
 import React from "react";
 
-
+import { File} from "lucide-react";
 
 const SubmittedPurchaseOrderTable = ({ data }) => {
   
@@ -14,9 +14,9 @@ const SubmittedPurchaseOrderTable = ({ data }) => {
       
 
       {submittedOrders.length === 0 ? (
-        <p className="text-center text-gray-500">
-          No submitted purchase orders found.
-        </p>
+         <div className="flex items-center gap-2 text-green-600 bg-green-50 border border-green-300 p-3 rounded-md">
+                <File /> No Submitted Purchase Order
+              </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-[700px] w-full border-collapse text-green-600">
