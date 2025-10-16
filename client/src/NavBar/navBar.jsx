@@ -57,7 +57,7 @@ export default function Navbar({ menuItems = [] }) {
             <button
               key={idx}
               onClick={() => handleNavClick(item)}
-              className="hover:text-gray-200 transition-colors"
+              className="font-semibold hover:text-gray-200 transition-colors"
             >
               {item}
             </button>

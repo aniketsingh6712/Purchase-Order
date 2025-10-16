@@ -41,11 +41,11 @@ const DraftPurchaseOrderTable = ({ data,onDraftSubmit ,onDeletePOs}) => {
                   <td className="py-2 px-4 text-yellow-600 font-semibold">
                     {order.status}
                   </td>
-                   <td className="py-2 px-1">
+                   <td className="py-2 px-1 flex flex flex-row justify-between">
                     
    <button
     onClick={()=>onDeletePOs(order._id)}
-    className="p-2 mx-4 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+    className="p-2 m-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
     title="Delete"
   >
     <FaTrash size={14} />

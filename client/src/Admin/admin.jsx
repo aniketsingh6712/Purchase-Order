@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AdminUserTable from "./AdminTable";
 import { toast } from "react-toastify";
-import Navbar from "../NavBar/navBar";
+
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
    const token = sessionStorage.getItem("authToken"); 
