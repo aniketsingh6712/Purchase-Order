@@ -82,7 +82,7 @@ const AllOrdersTable = () => {
 
   return (
     <>
-              <h2 className="text-2xl font-bold text-blue-600 my-3">
+              <h2 className="text-2xl font-bold text-blue-600 my-5 ms-6">
           Created Orders
         </h2>
       {/* <Navbar menuItems={["Home", "Orders"]} /> */}

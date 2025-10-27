@@ -12,7 +12,7 @@ function ApproverDashboard() {
   const [view, setView] = useState("approved");
   const [approvedPOs,setApprovedPOs]=useState([]);
   const [rejectedPOs,setRejectedPOs]=useState([]);
-
+  const [mainView,setMainView]=useState("submitted");
   const fetchAllPOs = async () => {
     setLoading(true);
     const token = sessionStorage.getItem("authToken");
@@ -146,72 +146,106 @@ const rejectionHandler = async (id, comment) => {
   }
 };
 
-  return (
-    <>
+return (
+  <div className="flex min-h-screen bg-gray-50">
+    
+    {/* Sidebar */}
+    <aside className="w-56 bg-[#155dfc] text-white p-5 space-y-4">
+      <h2 className="text-xl font-bold mb-4">Approver Dashboard</h2>
 
-      <div className="p-4 sm:p-6 mt-5 max-w-6xl mx-auto space-y-6">
-        <h2 className="text-2xl font-bold text-green-600">
-          Approver Dashboard
-        </h2>
+      <button
+        onClick={() => setMainView("submitted")}
+        className={`w-full p-3 rounded text-left transition ${
+          mainView === "submitted"
+            ? "bg-white text-[#155dfc] font-semibold"
+            : "hover:bg-blue-600"
+        }`}
+      >
+        Submitted PO’s
+      </button>
 
+      <button
+        onClick={() => setMainView("history")}
+        className={`w-full p-3 rounded text-left transition ${
+          mainView === "history"
+            ? "bg-white text-[#155dfc] font-semibold"
+            : "hover:bg-blue-600"
+        }`}
+      >
+        Approved / Rejected PO’s
+      </button>
+    </aside>
+
+    {/* Main Area */}
+    <main className="flex-1 p-6 mt-4 space-y-6">
+      {/* Submitted Tab */}
+      {mainView === "submitted" && (
         <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
           {loading ? (
             <p className="text-center text-blue-600">Loading...</p>
           ) : (
-            <SubmittedPurchaseOrderTable data={submittedPOs} approverHandler={approverHandler} rejectionHandler={rejectionHandler}/>
+            <SubmittedPurchaseOrderTable
+              data={submittedPOs}
+              approverHandler={approverHandler}
+              rejectionHandler={rejectionHandler}
+            />
           )}
-        </div>
-
-         {/* Approved & Rejected Purchase Orders */}
-      <div className="bg-white p-4 rounded-lg shadow space-y-4">
-     
-      <div className="flex gap-2">
-        <button
-          onClick={() => setView("approved")}
-          className={`px-4 py-2 rounded-md ${
-            view === "approved"
-              ? "bg-green-600 text-white"
-              : "bg-gray-300 text-gray-700"
-          }`}
-        >
-          Approved
-        </button>
-        <button
-          onClick={() => setView("rejected")}
-          className={`px-4 py-2 rounded-md ${
-            view === "rejected"
-              ? "bg-red-600 text-white"
-              : "bg-gray-300 text-gray-700"
-          }`}
-        >
-          Rejected
-        </button>
-      </div>
-
-      {/*  Loading */}
-      
-      {loading ? (
-        <p className="text-center text-blue-600">Loading...</p>
-      ) : view === "approved" ? (
-        approvedPOs.length > 0 ? (
-           <ApproverOrRejectedOrderTable data={approvedPOs} view={view}/>
-        ) : (
-          <div className="flex items-center gap-2 text-green-600 bg-green-50 border border-green-300 p-3 rounded-md">
-            <CheckCircle /> No Approved Purchase Orders
-          </div>
-        )
-      ) : rejectedPOs.length > 0 ? (
-         <ApproverOrRejectedOrderTable data={rejectedPOs} view={view}/>
-      ) : (
-        <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-300 p-3 rounded-md">
-          <XCircle /> No Rejected Purchase Orders
         </div>
       )}
 
-    </div>
-      </div>
-    </>
-  );
+      {/* Approved + Rejected Tab */}
+      {mainView === "history" && (
+        <div className="bg-white p-4 rounded-lg shadow space-y-4">
+          {/* Toggler buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setView("approved")}
+              className={`px-4 py-2 rounded-md ${
+                view === "approved"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-300 text-gray-700"
+              }`}
+            >
+              Approved
+            </button>
+            <button
+              onClick={() => setView("rejected")}
+              className={`px-4 py-2 rounded-md ${
+                view === "rejected"
+                  ? "bg-red-600 text-white"
+                  : "bg-gray-300 text-gray-700"
+              }`}
+            >
+              Rejected
+            </button>
+          </div>
+
+          {/* Approved / Rejected Data */}
+          {loading ? (
+            <p className="text-center text-blue-600">Loading...</p>
+          ) : view === "approved" ? (
+            approvedPOs.length > 0 ? (
+              <ApproverOrRejectedOrderTable
+                data={approvedPOs}
+                view={view}
+              />
+            ) : (
+              <div className="flex items-center gap-2 text-green-600 bg-green-50 border border-green-300 p-3 rounded-md">
+                <CheckCircle /> No Approved Purchase Orders
+              </div>
+            )
+          ) : rejectedPOs.length > 0 ? (
+            <ApproverOrRejectedOrderTable data={rejectedPOs} view={view} />
+          ) : (
+            <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-300 p-3 rounded-md">
+              <XCircle /> No Rejected Purchase Orders
+            </div>
+          )}
+        </div>
+      )}
+    </main>
+  </div>
+);
 }
 
 export default ApproverDashboard;

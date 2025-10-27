@@ -20,6 +20,7 @@ function UserDashboard() {
 
   const [showForm, setShowForm] = useState(false);
   const [view, setView] = useState("approved"); 
+    const [mainView, setMainView] = useState("draft"); 
 
   const [draftPOs, setDraftPOs] = useState([]);
   const [submittedPOs, setSubmittedPOs] = useState([]);
@@ -149,20 +150,61 @@ const DeletePOs = async (id) => {
       toast.error(err.response?.data?.error || "Failed to delete PO");
     }
   };
-  return (
-    <>
-      {/* <Navbar menuItems={["Home", "Orders"]}/> */}
-      <div className="p-4 sm:p-6 mt-5 max-w-5xl mx-auto space-y-6">
-        <h2 className="text-2xl font-bold text-blue-600">
-          Purchase Order Dashboard
-        </h2>
+ return (
+  <div className="flex min-h-screen">
+    
+    {/* Sidebar */}
+    <div className="w-56 bg-[#155dfc] text-white p-4 flex flex-col gap-3">
+      <h2 className="text-xl font-bold mb-4">POs  Dashboard</h2>
+      <button
+        onClick={() => setMainView("draft")}
+        className={`p-3 rounded-lg text-left transition ${
+          mainView=== "draft" ? "bg-white text-[#155dfc]" : "hover:bg-blue-700"
+        }`}
+      >
+        Drafted POs
+      </button>
 
-        {/* Drafted Purchase Orders */}
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-blue-600">
+      <button
+        onClick={() => setMainView("submitted")}
+        className={`p-3 rounded-lg text-left transition ${
+          mainView === "submitted" ? "bg-white text-[#155dfc]" : "hover:bg-blue-700"
+        }`}
+      >
+        Submitted POs
+      </button>
+
+      <button
+        onClick={() => setMainView("completed")}
+        className={`p-3 rounded-lg text-left transition ${
+          mainView === "completed" ? "bg-white text-[#155dfc]" : "hover:bg-blue-700"
+        }`}
+      >
+        Approved / Rejected
+      </button>
+
+      <button
+        onClick={() => setMainView("create")}
+        className={`p-3 rounded-lg text-left transition ${
+          mainView === "create" ? "bg-white text-[#155dfc]" : "hover:bg-blue-700"
+        }`}
+      >
+        Create New PO
+      </button>
+    </div>
+
+    {/* Main Content */}
+    <div className="flex-1 p-6 space-y-6 bg-white-700">
+
+      {/** -------- Drafted -------- */}
+      {mainView === "draft" && (
+        <>
+        <h2 className="text-xl font-semibold text-blue-600">
               Drafted Purchase Orders
             </h2>
+        <div className="bg-white p-4 rounded-lg shadow space-y-4">
+          <div className="flex justify-between items-center">
+            
             <button
               onClick={() => setShowForm(true)}
               className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
@@ -176,20 +218,37 @@ const DeletePOs = async (id) => {
           ) : draftPOs.length === 0 ? (
             <EmptyDataPrompt message="No drafted purchase orders found" />
           ) : (
-            <DraftPurchaseOrderTable data={draftPOs} onDraftSubmit={DraftSubmit} onDeletePOs={DeletePOs}/>
+            <DraftPurchaseOrderTable
+              data={draftPOs}
+              onDraftSubmit={DraftSubmit}
+              onDeletePOs={DeletePOs}
+            />
           )}
         </div>
+        </>
+      )}
 
-        {/* Submitted Purchase Orders */}
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow space-y-4">
-          <h2 className="text-lg font-semibold text-green-600">
+      {/** -------- Submitted -------- */}
+      {mainView === "submitted" && (
+        <>
+        <h2 className="text-xl font-semibold text-green-600">
             Submitted Purchase Orders
           </h2>
-          <SubmittedPurchaseOrderTable data={submittedPOs} />
-        </div>
-
-        {/* Approved & Rejected Purchase Orders */}
         <div className="bg-white p-4 rounded-lg shadow space-y-4">
+         
+
+          {loading ? (
+            <p className="text-center text-blue-600">Loading...</p>
+          ) : (
+            <SubmittedPurchaseOrderTable data={submittedPOs} />
+          )}
+        </div>
+        </>
+      )}
+
+      {/** -------- Approved / Rejected -------- */}
+      {mainView === "completed" && (
+       <div className="bg-white p-4 rounded-lg shadow space-y-4">
           <div className="flex gap-2">
             <button
               onClick={() => setView("approved")}
@@ -212,8 +271,7 @@ const DeletePOs = async (id) => {
               Rejected
             </button>
           </div>
-
-          {loading ? (
+         {loading ? (
             <p className="text-center text-blue-600">Loading...</p>
           ) : view === "approved" ? (
             approvedPOs.length > 0 ? (
@@ -230,38 +288,62 @@ const DeletePOs = async (id) => {
               <XCircle /> No Rejected Purchase Orders
             </div>
           )}
+       
         </div>
+      )}
 
-        {/* Form Modal for New PO */}
-        {showForm && (
-          <div className="fixed inset-0 bg-blue-500 bg-opacity-50 flex justify-center items-center z-50 p-2">
-            <form
-              onSubmit={submitPurchaseOrder}
-              className="bg-white p-4 sm:p-6 rounded-lg shadow max-w-md w-full space-y-4"
+      {/** -------- Create PO View -------- */}
+      {mainView === "create" && (
+        <div className="flex justify-center items-center ">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow lg:w-lg sm:w-sm" >
+          <h2 className="text-xl font-semibold text-blue-600 mb-3">Create New Purchase Order</h2>
+          <form onSubmit={submitPurchaseOrder} className="space-y-4 ">
+            <ExpenseForm formData={formData} onChange={handleChange} />
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full"
+              >
+                Save PO
+              </button>
+            </div>
+          </form>
+        </div>
+        </div>
+      )}
+    </div>
+
+    {/* Form Modal (kept same for quick draft from draft tab) */}
+    {showForm && (
+      <div className="fixed inset-0 bg-neutral-900 bg-opacity-50 flex justify-center items-center z-50 p-2">
+        <form
+          onSubmit={submitPurchaseOrder}
+          className="bg-white p-4 sm:p-6 rounded-lg shadow max-w-md w-full space-y-4"
+        >
+          <ExpenseForm formData={formData} onChange={handleChange} />
+
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-full"
             >
-              <ExpenseForm formData={formData} onChange={handleChange} />
-
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-full"
-                >
-                  Close
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full"
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
+              Close
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full"
+            >
+              Submit
+            </button>
           </div>
-        )}
+        </form>
       </div>
-    </>
-  );
+    )}
+  </div>
+);
+
 }
 
 export default UserDashboard;
